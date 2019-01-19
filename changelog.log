@@ -1,3 +1,12 @@
+2019-Jan-19
+FIXED: Timed Gate unit coarse and fine duration parameters were not accepting modulation
+JANITORIAL: Libarary renamed from Joe's Bespoke ER-301 Units to Accents
+JANITORIAL: Timed Gate unit moved to Timing category
+JANITORIAL: Bespoke BPF renamed to Ladder BPF
+JANITORIAL: Bespoke Aliasing Pulse renamed to Aliasing Pulse
+JANITORIAL: Bespoke Ensemble renamed to Ensemble
+ENHCANCED: Moved unit Scorpio to this library, updated to work with 0.4x firmware, and renamed to Scorpio Vocoder.  This unit is a collaboration with @kel
+
 2018-Oct-24
 Applied Middle Layer API changes from v0.4.04 firmware.
 

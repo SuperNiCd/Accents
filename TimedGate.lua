@@ -34,6 +34,8 @@ function TimedGate:onLoadGraph(channelCount)
   local durationAdapter = self:createObject("ParameterAdapter","durationAdapter")
   local t1 = self:createObject("GainBias","t1")
   local t2 = self:createObject("GainBias","t2")
+  local t1Range = self:createObject("MinMax","t1Range")
+  local t2Range = self:createObject("MinMax","t2Range")
   local trig = self:createObject("Comparator","trig")
 
   trig:setTriggerMode()
@@ -66,6 +68,10 @@ function TimedGate:onLoadGraph(channelCount)
 
   connect(t1,"Out",durationSum,"Left")
   connect(t2,"Out",durationSum,"Right")
+
+  connect(t1,"Out",t1Range,"In")
+  connect(t2,"Out",t2Range,"In")
+
   connect(durationSum,"Out",durationAdapter,"In")
   tie(skewedsin,"Duration",durationAdapter,"Out")
 
@@ -104,7 +110,7 @@ function TimedGate:onLoadViews(objects,branches)
     description = "Duration sec",
     branch = branches.durs,
     gainbias = objects.t1,
-    range = objects.t1,
+    range = objects.t1Range,
     biasMap = secMap,
     biasUnits = app.unitSecs,
     initialBias = 0.0,
@@ -115,7 +121,7 @@ function TimedGate:onLoadViews(objects,branches)
     description = "Duration msec",
     branch = branches.durms,
     gainbias = objects.t2,
-    range = objects.t2,
+    range = objects.t2Range,
     biasMap = Encoder.getMap("unit"),
     biasUnits = app.unitSecs,
     initialBias = 0.5,
