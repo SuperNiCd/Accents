@@ -1,15 +1,15 @@
-# Joe-s-Bespoke-ER-301-Units
+# Accents
 This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It currently contains:
 
 * Ring Modulator
 * Compare
-* Bespoke BPF
+* Ladder BPF
 * Pingable Scaled Random
 * Clocked Random Gate
 * Weighted Coin Toss
 * Motion Sensor
-* Bespoke Ensemble
-* Bespoke Aliasing Pulse
+* Ensemble
+* Aliasing Pulse
 * Flanger
 * Carousel Clock Divider
 * Maths
@@ -17,6 +17,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Voltage Bank
 * Octave CV Shifter
 * Timed Gate
+* Scorpio Vocoder
 
 For more details and discussion about these units, please visit:
 
