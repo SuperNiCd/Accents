@@ -1,0 +1,36 @@
+2018-Oct-24
+Applied Middle Layer API changes from v0.4.04 firmware.
+
+2018-Oct-14
+NEW UNIT: Timed Gate
+JANITORIAL: Moved Voltage Bank, Maths, and Logics to Mapping and Control
+
+2018-Oct-09
+NEW UNIT: Octave CV Shifter
+
+2018-Sep-15
+FIXED: Logics unit, added missing modulation sliders for true and false controls (thanks Brian!)
+NEW UNIT: Voltage Bank
+
+2018-Sep-13
+NEW UNIT: Logics
+NEW UNIT: Maths
+JANITORIAL: Moved units from Experimental to appropriate categories.
+
+2018-Sep-04
+ENHANCED: Compare threshold control now goes from -1.0 to 1.0
+ENHANCED: Bespoke Aliasing Pulse, added sync option (probably most useful when using this unit for CV)
+NEW UNIT: Carousel Clock Divider
+
+2018-Aug-19
+NEW UNIT:  Flanger
+
+2018-Aug-12
+NEW UNIT:  Bespoke Ensemble
+NEW UNIT:  Bespoke Aliasing Pulse
+
+2018-Aug-04
+ENHANCED:  Motion Sensor sensitivty is now 4x as sensitive.  A setting of 25 is now the old 100.  A setting of 100 now makes it hypersensitive to changes in voltage
+ENCANCED:  Weighted coin toss now has menu option to set low output.  Choose 0 or -1
+ENHANCED:  All units updated to have localized scale maps.  This is a back end performance improvement
+FIXED:  Clocked Random Gate no longer crashes when opening unit menu
