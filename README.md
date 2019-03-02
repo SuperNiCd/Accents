@@ -18,6 +18,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Octave CV Shifter
 * Timed Gate
 * Scorpio Vocoder
+* Linear Sampling VCA
 
 For more details and discussion about these units, please visit:
 

@@ -12,8 +12,8 @@ local BespokeBPF = Class{}
 BespokeBPF:include(Unit)
 
 function BespokeBPF:init(args)
-  args.title = "Bespoke BPF"
-  args.mnemonic = "BB"
+  args.title = "Ladder BPF"
+  args.mnemonic = "LB"
   Unit.init(self,args)
 end
 

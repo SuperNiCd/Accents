@@ -15,7 +15,7 @@ local StereoEnsemble = Class{}
 StereoEnsemble:include(Unit)
 
 function StereoEnsemble:init(args)
-  args.title = "Stereo Ensemble"
+  args.title = "Ensemble"
   args.mnemonic = "SE"
   Unit.init(self,args)
 end

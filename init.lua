@@ -2,13 +2,17 @@ local units = {
     {category = "Delays and Reverb"},
     {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
     {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
+
     {category="Filtering"},
     {title="Ladder BPF",moduleName="BespokeBPF",keywords="filter"},
     {title="Scorpio Vocoder", moduleName="Scorpio", keywords="filter, modulate"},
-     {category="Modulation"},
+
+    {category="Modulation"},
     {title="Ring Modulator",moduleName="Ringmod",keywords="pitch, modulate"},
+
     {category="Oscillators"},
     {title="Aliasing Pulse",moduleName="BespokeAliasingPulse",keywords="oscillator"},
+
     {category="Mapping and Control"},
     {title="Compare",moduleName="Compare",keywords="mapping,control"},
     {title="Clocked Random Gate",moduleName="ClockedRandomGate",keywords="control"},
@@ -19,9 +23,13 @@ local units = {
     {title="Logics",moduleName="Logics",keywords="mapping,control"},
     {title="Voltage Bank",moduleName="VoltageBank",keywords="mapping"},
     {title="Octave CV Shifter", moduleName="OctaveCVShifter",keywords="mapping"},
+
     {category="Timing"},
     {title="Carousel Clock Divider",moduleName="CarouselClockDivider",keywords="timing"},
     {title="Timed Gate", moduleName="TimedGate",keywords="timing"},
+    
+    {category="Experimental"},
+    {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
   }
   
   return {

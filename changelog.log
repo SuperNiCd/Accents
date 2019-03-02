@@ -1,3 +1,10 @@
+2019-Mar-02 - Accents v0.4.11.0
+NEW UNIT: Linear Sampling VCA
+ENCHANCED:  Voltage Bank header menu options removed, output bypass toggle added
+JANITORIAL: Updated unit names in headers to match unit names in insert menu
+JANITORIAL: Introduced a version number that follows the ER-301 firmware version x.y where x is the ER-301 firmware version
+            correlating with this release of Accents, and y is the yth Accents release made on this firmware
+
 2019-Jan-19
 FIXED: Timed Gate unit coarse and fine duration parameters were not accepting modulation
 JANITORIAL: Libarary renamed from Joe's Bespoke ER-301 Units to Accents

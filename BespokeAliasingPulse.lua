@@ -13,7 +13,7 @@ local AliasingPulse = Class{}
 AliasingPulse:include(Unit)
 
 function AliasingPulse:init(args)
-  args.title = "Bespoke Aliasing Pulse"
+  args.title = "Aliasing Pulse"
   args.mnemonic = "AP"
   Unit.init(self,args)
 end

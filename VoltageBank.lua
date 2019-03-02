@@ -51,9 +51,20 @@ function VoltageBank:onLoadGraph(channelCount)
   local indexRange = self:createObject("MinMax","indexRange")
   local trig = self:createObject("Comparator","trig")
   local divIndex = self:createObject("ConstantGain","divIndex")
+
+  local bypass = self:createObject("Comparator","bypass")
+  local invertingVCA = self:createObject("Multiply","invertingVCA")
+  local negOne = self:createObject("ConstantOffset","negOne")
+  local one = self:createObject("ConstantOffset","one")
+  local bypassSum = self:createObject("Sum","bypassSum")
+  bypass:setToggleMode()
+  negOne:hardSet("Offset",-1.0)
+  one:hardSet("Offset",1.0)
+
   divIndex:hardSet("Gain",1/numSlots)
   self:createMonoBranch("trig",trig,"In",trig,"Out")
   self:createMonoBranch("index",index,"In",index,"Out")
+  self:createMonoBranch("bypass",bypass,"In",bypass,"Out")
 
   local bumpMapWidth = 1 / numSlots
   local bumpMapOffset = bumpMapWidth / 2
@@ -99,10 +110,16 @@ function VoltageBank:onLoadGraph(channelCount)
   end
 
   connect(localVars["shMix" .. numSlots-1],"Out",indexToOutVCA,"Left")
-  connect(indexToOutVCAConst,"Out",indexToOutVCA,"Right")
+  -- connect(indexToOutVCAConst,"Out",indexToOutVCA,"Right")
+  connect(negOne,"Out",invertingVCA,"Left")
+  connect(bypass,"Out",invertingVCA,"Right")
+  connect(invertingVCA,"Out",bypassSum,"Left")
+  connect(one,"Out",bypassSum,"Right")
+  connect(bypassSum,"Out",indexToOutVCA,"Right")
   connect(indexToOutVCA,"Out",outputMixer,"Left")
   connect(self,"In1",inToOutVCA,"Left")
-  connect(inToOutVCAConst,"Out",inToOutVCA,"Right")
+  -- connect(inToOutVCAConst,"Out",inToOutVCA,"Right")
+  connect(bypass,"Out",inToOutVCA,"Right")
   connect(inToOutVCA,"Out",outputMixer,"Right")
   connect(outputMixer,"Out",self,"Out1")
 end
@@ -119,25 +136,25 @@ local menu = {
   "edit"
 }
 
-function VoltageBank:setOp(op)
-  local objects = self.objects
-  self.op = op
+-- function VoltageBank:setOp(op)
+--   local objects = self.objects
+--   self.op = op
 
-  if op=="index" then
-    objects.inToOutVCAConst:hardSet("Value",0.0)
-    objects.indexToOutVCAConst:hardSet("Value",1.0)
-  elseif op=="input" then
-    objects.inToOutVCAConst:hardSet("Value",1.0)
-    objects.indexToOutVCAConst:hardSet("Value",0.0)
-  elseif op=="sum" then
-    objects.inToOutVCAConst:hardSet("Value",1.0)
-    objects.indexToOutVCAConst:hardSet("Value",1.0)
-  end
-end
+--   if op=="index" then
+--     objects.inToOutVCAConst:hardSet("Value",0.0)
+--     objects.indexToOutVCAConst:hardSet("Value",1.0)
+--   elseif op=="input" then
+--     objects.inToOutVCAConst:hardSet("Value",1.0)
+--     objects.indexToOutVCAConst:hardSet("Value",0.0)
+--   elseif op=="sum" then
+--     objects.inToOutVCAConst:hardSet("Value",1.0)
+--     objects.indexToOutVCAConst:hardSet("Value",1.0)
+--   end
+-- end
 
-function VoltageBank:onLoadFinished()
-  self:setOp("index")
-end
+-- function VoltageBank:onLoadFinished()
+--   self:setOp("index")
+-- end
 
 function VoltageBank:serialize()
   local t = Unit.serialize(self)
@@ -152,36 +169,36 @@ function VoltageBank:deserialize(t)
   end
 end
 
-function VoltageBank:onLoadMenu(objects,branches)
-  local controls = {}
+-- function VoltageBank:onLoadMenu(objects,branches)
+--   local controls = {}
 
-  controls.setHeader = MenuHeader {
-    description = string.format("Output signal: %s.",self.op)
-  }
+--   controls.setHeader = MenuHeader {
+--     description = string.format("Output signal: %s.",self.op)
+--   }
 
-  controls.index = Task {
-    description = "index",
-    task = function()
-      self:setOp("index")
-    end
-  }
+--   controls.index = Task {
+--     description = "index",
+--     task = function()
+--       self:setOp("index")
+--     end
+--   }
 
-  controls.input = Task {
-    description = "input",
-    task = function()
-      self:setOp("input")
-    end
-  }
+--   controls.input = Task {
+--     description = "input",
+--     task = function()
+--       self:setOp("input")
+--     end
+--   }
 
-  controls.sum = Task {
-    description = "sum",
-    task = function()
-      self:setOp("sum")
-    end
-  }
+--   controls.sum = Task {
+--     description = "sum",
+--     task = function()
+--       self:setOp("sum")
+--     end
+--   }
 
-  return controls, menu
-end
+--   return controls, menu
+-- end
 
 local function intMap(min,max)
   local map = app.LinearDialMap(min,max)
@@ -193,7 +210,7 @@ end
 local indexMap = intMap(1,8)  -- adjust max param for numSlots
 
 local views = {
-  expanded = {"trigger","index"},
+  expanded = {"trigger","index","bypass"},
   collapsed = {},
 }
 
@@ -217,6 +234,13 @@ function VoltageBank:onLoadViews(objects,branches)
     biasPrecision = 0,
     gainMap = indexMap,
     initialBias = 1,
+  }
+
+  controls.bypass = Gate {
+    button = "bypass",
+    description = "Pass thru Input",
+    branch = branches.bypass,
+    comparator = objects.bypass,
   }
 
   return controls, views
