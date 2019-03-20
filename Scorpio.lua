@@ -360,6 +360,7 @@ local menu = {
 }
 
 function Scorpio:onLoadMenu(objects,branches)
+  local controls = {}
 
   controls.setHeader = MenuHeader {
     description = string.format("Display frequency controls: %s.",controlMode)
@@ -375,7 +376,7 @@ function Scorpio:onLoadMenu(objects,branches)
     task = function() self:changeControlMode("yes") end
   }
 
-  return menu
+  return controls, menu
 end
 
 
