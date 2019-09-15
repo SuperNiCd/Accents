@@ -1,3 +1,8 @@
+2019-09-15 Accents v0.4.25.0
+NEW UNIT: AB Switch
+FIXED: Logics unit now correctly saves logic operation with presets
+JANITORIAL: Moved Linear Sampling VCA to Essentials category
+
 2019-Mar-02 - Accents v0.4.11.0
 NEW UNIT: Linear Sampling VCA
 ENCHANCED:  Voltage Bank header menu options removed, output bypass toggle added
