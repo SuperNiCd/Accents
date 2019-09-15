@@ -270,87 +270,113 @@ local menu = {
 
 local op = "AND"
 
-function Logics:onLoadMenu(objects,branches)
-  local controls = {}
-
-  controls.setHeader = MenuHeader {
-    description = string.format("Current op is: %s.",op)
-  }
-
-  controls.opAND = Task {
-    description = "AND",
-    task = function()
+function Logics:setOp(op)
+    local objects = self.objects
+    self.op = op
+    if op=="AND" then
       objects.ANDSelectorConst:hardSet("Value",1.0)
       objects.ORSelectorConst:hardSet("Value",0.0)
       objects.XORSelectorConst:hardSet("Value",0.0)
       objects.NOTInverterConst:hardSet("Value",1.0)
       objects.NOTOffsetConst:hardSet("Value",0.0)
-      op = "AND"
+    elseif op=="OR" then
+      objects.ANDSelectorConst:hardSet("Value",0.0)
+      objects.ORSelectorConst:hardSet("Value",1.0)
+      objects.XORSelectorConst:hardSet("Value",0.0)
+      objects.NOTInverterConst:hardSet("Value",1.0)
+      objects.NOTOffsetConst:hardSet("Value",0.0)
+    elseif op=="XOR" then
+      objects.ANDSelectorConst:hardSet("Value",0.0)
+      objects.ORSelectorConst:hardSet("Value",0.0)
+      objects.XORSelectorConst:hardSet("Value",1.0)
+      objects.NOTInverterConst:hardSet("Value",1.0)
+      objects.NOTOffsetConst:hardSet("Value",0.0)
+    elseif op=="NAND" then
+      objects.ANDSelectorConst:hardSet("Value",1.0)
+      objects.ORSelectorConst:hardSet("Value",0.0)
+      objects.XORSelectorConst:hardSet("Value",0.0)
+      objects.NOTInverterConst:hardSet("Value",-1.0)
+      objects.NOTOffsetConst:hardSet("Value",1.0)
+    elseif op=="NOR" then
+      objects.ANDSelectorConst:hardSet("Value",0.0)
+      objects.ORSelectorConst:hardSet("Value",1.0)
+      objects.XORSelectorConst:hardSet("Value",0.0)
+      objects.NOTInverterConst:hardSet("Value",-1.0)
+      objects.NOTOffsetConst:hardSet("Value",1.0)
+    elseif op=="XNOR" then
+      objects.ANDSelectorConst:hardSet("Value",0.0)
+      objects.ORSelectorConst:hardSet("Value",0.0)
+      objects.XORSelectorConst:hardSet("Value",1.0)
+      objects.NOTInverterConst:hardSet("Value",-1.0)
+      objects.NOTOffsetConst:hardSet("Value",1.0)
+    end
+end
+
+function Logics:onLoadMenu(objects,branches)
+  local controls = {}
+
+  controls.setHeader = MenuHeader {
+    description = string.format("Current op is: %s.",self.op)
+  }
+
+  controls.opAND = Task {
+    description = "AND",
+    task = function()
+      self:setOp("AND")
     end
   }
 
   controls.opOR = Task {
     description = "OR",
     task = function()
-      objects.ANDSelectorConst:hardSet("Value",0.0)
-      objects.ORSelectorConst:hardSet("Value",1.0)
-      objects.XORSelectorConst:hardSet("Value",0.0)
-      objects.NOTInverterConst:hardSet("Value",1.0)
-      objects.NOTOffsetConst:hardSet("Value",0.0)
-      op = "OR"
+        self:setOp("OR")
     end
   }
 
   controls.opXOR = Task {
     description = "XOR",
     task = function()
-      objects.ANDSelectorConst:hardSet("Value",0.0)
-      objects.ORSelectorConst:hardSet("Value",0.0)
-      objects.XORSelectorConst:hardSet("Value",1.0)
-      objects.NOTInverterConst:hardSet("Value",1.0)
-      objects.NOTOffsetConst:hardSet("Value",0.0)
-      op = "XOR"
+      self:setOp("XOR")
     end
   }
 
   controls.opNAND = Task {
     description = "NAND",
     task = function()
-      objects.ANDSelectorConst:hardSet("Value",1.0)
-      objects.ORSelectorConst:hardSet("Value",0.0)
-      objects.XORSelectorConst:hardSet("Value",0.0)
-      objects.NOTInverterConst:hardSet("Value",-1.0)
-      objects.NOTOffsetConst:hardSet("Value",1.0)
-      op = "NAND"
+      self:setOp("NAND")
     end
   }
 
   controls.opNOR = Task {
     description = "NOR",
     task = function()
-      objects.ANDSelectorConst:hardSet("Value",0.0)
-      objects.ORSelectorConst:hardSet("Value",1.0)
-      objects.XORSelectorConst:hardSet("Value",0.0)
-      objects.NOTInverterConst:hardSet("Value",-1.0)
-      objects.NOTOffsetConst:hardSet("Value",1.0)
-      op = "NOR"
+      self:setOp("NOR")
     end
   }
 
   controls.opXNOR = Task {
     description = "XNOR",
     task = function()
-      objects.ANDSelectorConst:hardSet("Value",0.0)
-      objects.ORSelectorConst:hardSet("Value",0.0)
-      objects.XORSelectorConst:hardSet("Value",1.0)
-      objects.NOTInverterConst:hardSet("Value",-1.0)
-      objects.NOTOffsetConst:hardSet("Value",1.0)
-      op = "XNOR"
+      self:setOp("XNOR")
     end
   }
-
-
-
   return controls, menu
+end
+
+function Logics:onLoadFinished()
+  self:setOp("AND")
+end
+
+function Logics:serialize()
+  local t = Unit.serialize(self)
+  t.logicOp = self.op
+  return t
+end
+
+function Logics:deserialize(t)
+  Unit.deserialize(self,t)
+  if t.logicOp then
+    self:setOp(t.logicOp)
+  end
 end
 return Logics

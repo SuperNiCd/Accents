@@ -1,4 +1,8 @@
 local units = {
+
+    {category="Essentials"},
+    {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
+    
     {category = "Delays and Reverb"},
     {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
     {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
@@ -12,6 +16,7 @@ local units = {
 
     {category="Oscillators"},
     {title="Aliasing Pulse",moduleName="BespokeAliasingPulse",keywords="oscillator"},
+    -- {title="Hexonic", moduleName="Hexonic", keywords="oscillator"},
 
     {category="Mapping and Control"},
     {title="Compare",moduleName="Compare",keywords="mapping,control"},
@@ -29,7 +34,9 @@ local units = {
     {title="Timed Gate", moduleName="TimedGate",keywords="timing"},
     
     {category="Experimental"},
-    {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
+    {title="AB Switch", moduleName="ABSwitch",keywords="control"}
+    -- {title="Equals",moduleName="Equals",keywords=""},
+    -- {title="Inverse",moduleName="Inverse",keywords=""}
   }
   
   return {
