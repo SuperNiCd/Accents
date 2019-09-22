@@ -2,7 +2,7 @@ local units = {
 
     {category="Essentials"},
     {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
-    
+
     {category = "Delays and Reverb"},
     {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
     {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
@@ -16,7 +16,7 @@ local units = {
 
     {category="Oscillators"},
     {title="Aliasing Pulse",moduleName="BespokeAliasingPulse",keywords="oscillator"},
-    -- {title="Hexonic", moduleName="Hexonic", keywords="oscillator"},
+    
 
     {category="Mapping and Control"},
     {title="Compare",moduleName="Compare",keywords="mapping,control"},
@@ -27,6 +27,8 @@ local units = {
     {title="Maths",moduleName="Maths",keywords="modulate"},
     {title="Logics",moduleName="Logics",keywords="mapping,control"},
     {title="Voltage Bank",moduleName="VoltageBank",keywords="mapping"},
+    {title="Voltage Bank 4",moduleName="VoltageBank4",keywords="mapping"},
+    {title="Voltage Bank 2",moduleName="VoltageBank2",keywords="mapping"},
     {title="Octave CV Shifter", moduleName="OctaveCVShifter",keywords="mapping"},
 
     {category="Timing"},
@@ -34,9 +36,14 @@ local units = {
     {title="Timed Gate", moduleName="TimedGate",keywords="timing"},
     
     {category="Experimental"},
-    {title="AB Switch", moduleName="ABSwitch",keywords="control"}
-    -- {title="Equals",moduleName="Equals",keywords=""},
-    -- {title="Inverse",moduleName="Inverse",keywords=""}
+    {title="AB Switch", moduleName="ABSwitch",keywords="control"},
+    
+
+    {category="Synthesizers"},
+    {title="Xoxoxo",moduleName="Xoxoxo",keywords="oscillator"},
+    {title="Xoxo",moduleName="Xoxo",keywords="oscillator"},
+    {title="Xo",moduleName="Xo",keywords="oscillator"}
+    
   }
   
   return {
