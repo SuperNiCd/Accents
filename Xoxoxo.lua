@@ -46,10 +46,10 @@ function Xoxoxo:loadMonoGraph()
     local level = self:createObject("GainBias","level")
     local levelRange = self:createObject("MinMax","levelRange")
     local sync = self:createObject("Comparator","sync")
-    local clip = self:createObject("Comparator","clip")
-    sync:setTriggerMode()
-    clip:setTriggerMode()
-    clip:hardSet("Threshold",1.0)
+    -- local clip = self:createObject("Comparator","clip")
+    -- sync:setTriggerMode()
+    -- clip:setTriggerMode()
+    -- clip:hardSet("Threshold",1.0)
 
     connect(tune,"Out",tuneRange,"In")
     connect(f0,"Out",f0Range,"In")
@@ -138,7 +138,7 @@ function Xoxoxo:loadMonoGraph()
 
     connect(localDSP["outputMixer5"],"Out",vca,"Right")
     connect(level,"Out",vca,"Left")
-    connect(localDSP["outputMixer5"],"Out",clip,"In")
+    -- connect(localDSP["outputMixer5"],"Out",clip,"In")
     connect(vca,"Out",self,"Out1")
 
     self:createMonoBranch("level",level,"In",level,"Out")
@@ -165,17 +165,25 @@ function Xoxoxo:loadStereoGraph()
 end
 
 local views = {
-  expanded = {"tune","freq","sync","level","clip"},
-  outputs = {"outLevelA","outLevelB","outLevelC","outLevelD","outLevelE","outLevelF","clip"},
+  expanded = {"tune","freq","sync","level"},
+  outputs = {"outLevelA","outLevelB","outLevelC","outLevelD","outLevelE","outLevelF"},
   ratios = {"ratioA","ratioB","ratioC","ratioD","ratioE","ratioF"},
   scan = {"scanA","scanB","scanC","scanD","scanE","scanF"},
   tune = {"tuneA","tuneB","tuneC","tuneD","tuneE","tuneF"},
+  track = {"trackA","trackB","trackC","trackD","trackE","trackF"},
   a = {"outLevelA","ratioA","scanA","tuneA","phaseAA","phaseAB","phaseAC","phaseAD","phaseAE","phaseAF","trackA"},
   b = {"outLevelB","ratioB","scanB","tuneB","phaseBA","phaseBB","phaseBC","phaseBD","phaseBE","phaseBF","trackB"},
   c = {"outLevelC","ratioC","scanC","tuneC","phaseCA","phaseCB","phaseCC","phaseCD","phaseCE","phaseCF","trackC"},
   d = {"outLevelD","ratioD","scanD","tuneD","phaseDA","phaseDB","phaseDC","phaseDD","phaseDE","phaseDF","trackD"},
   e = {"outLevelE","ratioE","scanE","tuneE","phaseEA","phaseEB","phaseEC","phaseED","phaseEE","phaseEF","trackE"},
   f = {"outLevelF","ratioF","scanF","tuneF","phaseFA","phaseFB","phaseFC","phaseFD","phaseFE","phaseFF","trackF"},
+  aIn = {"phaseAA","phaseBA","phaseCA","phaseDA","phaseEA","phaseFA"},
+  bIn = {"phaseAB","phaseBB","phaseCB","phaseDB","phaseEB","phaseFB"},
+  cIn = {"phaseAC","phaseBC","phaseCC","phaseDC","phaseEC","phaseFC"},
+  dIn = {"phaseAD","phaseBD","phaseCD","phaseDD","phaseED","phaseFD"},
+  eIn = {"phaseAE","phaseBE","phaseCE","phaseDE","phaseEE","phaseFE"},
+  fIn = {"phaseAF","phaseBF","phaseCF","phaseDF","phaseEF","phaseFF"},
+  phaseAA = {"scope","phaseAA"},
   collapsed = {},
 }
 
@@ -297,17 +305,24 @@ function Xoxoxo:onLoadViews(objects,branches)
     comparator = objects.sync,
   }
 
-  controls.clip = InputGate {
-    button = "clip",
-    description = "Clip Detector",
-    comparator = objects.clip,
-  }
+--   controls.clip = InputGate {
+--     button = "clip",
+--     description = "Clip Detector",
+--     comparator = objects.clip,
+--   }
 
   return controls, views
 end
 
 local menu = {
     "title",
+    "changeViews",
+    "changeViewMain",
+    "changeViewOutputs",
+    "changeViewRatios",
+    "changeViewWTable",
+    "changeViewTune",
+    "changeViewTrack",
     "operatorViews",
     "changeViewA",
     "changeViewB",
@@ -315,12 +330,13 @@ local menu = {
     "changeViewD",
     "changeViewE",
     "changeViewF",
-    "changeViews",
-    "changeViewMain",
-    "changeViewOutputs",
-    "changeViewRatios",
-    "changeViewWTable",
-    "changeViewTune",
+    "changeViewPMIndex",
+    "changeViewAIn",
+    "changeViewBIn",
+    "changeViewCIn",
+    "changeViewDIn",
+    "changeViewEIn",
+    "changeViewFIn",
     "infoHeader",
     "rename",
     "load",
@@ -374,8 +390,42 @@ end
         task = function() self:changeView("f") end
     }
 
+    controls.changeViewPMIndex = MenuHeader {
+        description = string.format("Phase Modulation Indices:")
+      }
+
+    controls.changeViewAIn = Task {
+        description = "@A",
+        task = function() self:changeView("aIn") end
+    }  
+
+    controls.changeViewBIn = Task {
+        description = "@B",
+        task = function() self:changeView("bIn") end
+    }  
+
+    controls.changeViewCIn = Task {
+        description = "@C",
+        task = function() self:changeView("cIn") end
+    }  
+
+    controls.changeViewDIn = Task {
+        description = "@D",
+        task = function() self:changeView("dIn") end
+    }  
+
+    controls.changeViewEIn = Task {
+        description = "@E",
+        task = function() self:changeView("eIn") end
+    }  
+
+    controls.changeViewFIn = Task {
+        description = "@F",
+        task = function() self:changeView("fIn") end
+    }  
+
     controls.changeViews = MenuHeader {
-      description = string.format("Additional Views:")
+      description = string.format("Aggregate Views:")
     }
   
     controls.changeViewMain = Task {
@@ -401,6 +451,11 @@ end
     controls.changeViewTune = Task {
         description = "freqs",
         task = function() self:changeView("tune") end
+    }
+
+    controls.changeViewTrack= Task {
+        description = "track",
+        task = function() self:changeView("track") end
     }
   
     return controls, menu

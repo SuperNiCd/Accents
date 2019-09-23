@@ -46,10 +46,10 @@ function Xoxo:loadMonoGraph()
     local level = self:createObject("GainBias","level")
     local levelRange = self:createObject("MinMax","levelRange")
     local sync = self:createObject("Comparator","sync")
-    local clip = self:createObject("Comparator","clip")
-    sync:setTriggerMode()
-    clip:setTriggerMode()
-    clip:hardSet("Threshold",1.0)
+    -- local clip = self:createObject("Comparator","clip")
+    -- sync:setTriggerMode()
+    -- clip:setTriggerMode()
+    -- clip:hardSet("Threshold",1.0)
 
     connect(tune,"Out",tuneRange,"In")
     connect(f0,"Out",f0Range,"In")
@@ -70,6 +70,11 @@ function Xoxo:loadMonoGraph()
         localDSP["op" .. name .. "tune"] = self:createObject("GainBias","op" .. name .. "tune")
         localDSP["op" .. name .. "tuneRange"] = self:createObject("MinMax","op" .. name .. "tuneRange")
         localDSP["op" .. name .. "tuneSum"] = self:createObject("Sum","op" .. name .. "tuneSum")
+        localDSP["op" .. name .. "track"] = self:createObject("Comparator","op" .. name .. "track")
+        localDSP["op" .. name .. "trackX"] = self:createObject("Multiply","op" .. name .. "trackX")
+        localDSP["op" .. name .. "track"]:setToggleMode()
+        localDSP["op" .. name .. "track"]:optionSet("State",1.0)
+        connect(localDSP["op" .. name .. "track"],"Out",localDSP["op" .. name .. "trackX"],"Left")
         connect(localDSP["op" .. name .. "scan"],"Out",localDSP["op" .. name .. "scanRange"],"In")
         connect(localDSP["op" .. name .. "scan"],"Out",localDSP["op" .. name],"Slice Select")
         connect(localDSP["op" .. name .. "ratio"],"Out",localDSP["op" .. name .. "ratioX"],"Left")
@@ -79,7 +84,8 @@ function Xoxo:loadMonoGraph()
         connect(localDSP["op" .. name .. "tuneSum"],"Out",localDSP["op" .. name],"Fundamental")
         connect(localDSP["op" .. name .. "tune"],"Out",localDSP["op" .. name .. "tuneRange"],"In")
         connect(localDSP["op" .. name .. "ratio"],"Out",localDSP["op" .. name .. "ratioRange"],"In")
-        connect(tune,"Out",localDSP["op" .. name],"V/Oct")
+        connect(tune,"Out",localDSP["op" .. name .. "trackX"],"Right")
+        connect(localDSP["op" .. name .. "trackX"],"Out",localDSP["op" .. name],"V/Oct")
         connect(sync,"Out",localDSP["op" .. name],"Sync")
         connect(localDSP["op" .. name],"Out",localDSP["op" .. name .. "outVCA"],"Left")
         connect(localDSP["op" .. name .. "outLevel"],"Out",localDSP["op" .. name .. "outVCA"],"Right")
@@ -109,7 +115,7 @@ function Xoxo:loadMonoGraph()
         connect(localDSP["phaseXD" .. name],"Out",localDSP["phaseMixer" .. name .. "2"],"Right")
         connect(localDSP["phaseMixer" .. name .. "1"],"Out",localDSP["phaseMixer" .. name .. "3"],"Left")
         connect(localDSP["phaseMixer" .. name .. "2"],"Out",localDSP["phaseMixer" .. name .. "3"],"Right")
-         connect(localDSP["phaseMixer" .. name .. "3"],"Out",localDSP["op" .. name],"Phase")
+        connect(localDSP["phaseMixer" .. name .. "3"],"Out",localDSP["op" .. name],"Phase")
     end 
 
     for i = 1, 3 do
@@ -122,10 +128,9 @@ function Xoxo:loadMonoGraph()
     connect(localDSP["outputMixer1"],"Out",localDSP["outputMixer3"],"Left")
     connect(localDSP["outputMixer2"],"Out",localDSP["outputMixer3"],"Right")
 
-
     connect(localDSP["outputMixer3"],"Out",vca,"Right")
     connect(level,"Out",vca,"Left")
-    connect(localDSP["outputMixer3"],"Out",clip,"In")
+    -- connect(localDSP["outputMixer5"],"Out",clip,"In")
     connect(vca,"Out",self,"Out1")
 
     self:createMonoBranch("level",level,"In",level,"Out")
@@ -140,6 +145,7 @@ function Xoxo:loadMonoGraph()
         self:createMonoBranch("outLevel" .. name,localDSP["op" .. name .. "outLevel"],"In",localDSP["op" .. name .. "outLevel"],"Out")
         self:createMonoBranch("scan" .. name,localDSP["op" .. name .. "scan"],"In",localDSP["op" .. name .. "scan"],"Out")
         self:createMonoBranch("tune" .. name,localDSP["op" .. name .. "tune"],"In",localDSP["op" .. name .. "tune"],"Out")
+        self:createMonoBranch("track" .. name,localDSP["op" .. name .. "track"],"In",localDSP["op" .. name .. "track"],"Out")
     end
 
 
@@ -151,17 +157,25 @@ function Xoxo:loadStereoGraph()
 end
 
 local views = {
-  expanded = {"tune","freq","sync","level","clip"},
-  outputs = {"outLevelA","outLevelB","outLevelC","outLevelD","outLevelE","outLevelF","clip"},
+  expanded = {"tune","freq","sync","level"},
+  outputs = {"outLevelA","outLevelB","outLevelC","outLevelD","outLevelE","outLevelF"},
   ratios = {"ratioA","ratioB","ratioC","ratioD","ratioE","ratioF"},
   scan = {"scanA","scanB","scanC","scanD","scanE","scanF"},
   tune = {"tuneA","tuneB","tuneC","tuneD","tuneE","tuneF"},
-  a = {"outLevelA","ratioA","scanA","tuneA","phaseAA","phaseAB","phaseAC","phaseAD","phaseAE","phaseAF"},
-  b = {"outLevelB","ratioB","scanB","tuneB","phaseBA","phaseBB","phaseBC","phaseBD","phaseBE","phaseBF"},
-  c = {"outLevelC","ratioC","scanC","tuneC","phaseCA","phaseCB","phaseCC","phaseCD","phaseCE","phaseCF"},
-  d = {"outLevelD","ratioD","scanD","tuneD","phaseDA","phaseDB","phaseDC","phaseDD","phaseDE","phaseDF"},
-  e = {"outLevelE","ratioE","scanE","tuneE","phaseEA","phaseEB","phaseEC","phaseED","phaseEE","phaseEF"},
-  f = {"outLevelF","ratioF","scanF","tuneF","phaseFA","phaseFB","phaseFC","phaseFD","phaseFE","phaseFF"},
+  track = {"trackA","trackB","trackC","trackD","trackE","trackF"},
+  a = {"outLevelA","ratioA","scanA","tuneA","phaseAA","phaseAB","phaseAC","phaseAD","phaseAE","phaseAF","trackA"},
+  b = {"outLevelB","ratioB","scanB","tuneB","phaseBA","phaseBB","phaseBC","phaseBD","phaseBE","phaseBF","trackB"},
+  c = {"outLevelC","ratioC","scanC","tuneC","phaseCA","phaseCB","phaseCC","phaseCD","phaseCE","phaseCF","trackC"},
+  d = {"outLevelD","ratioD","scanD","tuneD","phaseDA","phaseDB","phaseDC","phaseDD","phaseDE","phaseDF","trackD"},
+  e = {"outLevelE","ratioE","scanE","tuneE","phaseEA","phaseEB","phaseEC","phaseED","phaseEE","phaseEF","trackE"},
+  f = {"outLevelF","ratioF","scanF","tuneF","phaseFA","phaseFB","phaseFC","phaseFD","phaseFE","phaseFF","trackF"},
+  aIn = {"phaseAA","phaseBA","phaseCA","phaseDA","phaseEA","phaseFA"},
+  bIn = {"phaseAB","phaseBB","phaseCB","phaseDB","phaseEB","phaseFB"},
+  cIn = {"phaseAC","phaseBC","phaseCC","phaseDC","phaseEC","phaseFC"},
+  dIn = {"phaseAD","phaseBD","phaseCD","phaseDD","phaseED","phaseFD"},
+  eIn = {"phaseAE","phaseBE","phaseCE","phaseDE","phaseEE","phaseFE"},
+  fIn = {"phaseAF","phaseBF","phaseCF","phaseDF","phaseEF","phaseFF"},
+  phaseAA = {"scope","phaseAA"},
   collapsed = {},
 }
 
@@ -223,6 +237,13 @@ function Xoxo:onLoadViews(objects,branches)
             scaling = app.octaveScaling
         }
 
+        controls["track" .. name] = Gate {
+            button = name .. "Track",
+            description = name .. " Track V/Oct",
+            branch = branches["track" .. name],
+            comparator = objects["op" .. name .. "track"],
+          }
+
         for j, name2 in ipairs(opNames) do
             controls["phase" .. name .. name2] = GainBias {
                 button = name .. " to " .. name2,
@@ -276,28 +297,34 @@ function Xoxo:onLoadViews(objects,branches)
     comparator = objects.sync,
   }
 
-  controls.clip = InputGate {
-    button = "clip",
-    description = "Clip Detector",
-    comparator = objects.clip,
-  }
+--   controls.clip = InputGate {
+--     button = "clip",
+--     description = "Clip Detector",
+--     comparator = objects.clip,
+--   }
 
   return controls, views
 end
 
 local menu = {
     "title",
-    "operatorViews",
-    "changeViewA",
-    "changeViewB",
-    "changeViewC",
-    "changeViewD",
     "changeViews",
     "changeViewMain",
     "changeViewOutputs",
     "changeViewRatios",
     "changeViewWTable",
     "changeViewTune",
+    "changeViewTrack",
+    "operatorViews",
+    "changeViewA",
+    "changeViewB",
+    "changeViewC",
+    "changeViewD",
+    "changeViewPMIndex",
+    "changeViewAIn",
+    "changeViewBIn",
+    "changeViewCIn",
+    "changeViewDIn",
     "infoHeader",
     "rename",
     "load",
@@ -341,8 +368,32 @@ end
         task = function() self:changeView("d") end
     }
 
+    controls.changeViewPMIndex = MenuHeader {
+        description = string.format("Phase Modulation Indices:")
+      }
+
+    controls.changeViewAIn = Task {
+        description = "@A",
+        task = function() self:changeView("aIn") end
+    }  
+
+    controls.changeViewBIn = Task {
+        description = "@B",
+        task = function() self:changeView("bIn") end
+    }  
+
+    controls.changeViewCIn = Task {
+        description = "@C",
+        task = function() self:changeView("cIn") end
+    }  
+
+    controls.changeViewDIn = Task {
+        description = "@D",
+        task = function() self:changeView("dIn") end
+    }  
+
     controls.changeViews = MenuHeader {
-      description = string.format("Additional Views:")
+      description = string.format("Aggregate Views:")
     }
   
     controls.changeViewMain = Task {
@@ -368,6 +419,11 @@ end
     controls.changeViewTune = Task {
         description = "freqs",
         task = function() self:changeView("tune") end
+    }
+
+    controls.changeViewTrack= Task {
+        description = "track",
+        task = function() self:changeView("track") end
     }
   
     return controls, menu
