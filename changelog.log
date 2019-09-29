@@ -1,3 +1,8 @@
+2019-09-29 Accents v0.4.25.4
+ENHANCED: Small performance tweaks to XO synths.  Localized localDSP variable.
+FIXED: Flanger - capped feedback at 0.99 to prevent self-destruct mechanism
+NEW UNIT: XXXXXX (6 operator phase mod synth)
+
 2019-09-23 Accents v0.4.25.3
 ENHANCED: Various tweaks to XO synths.  See forum for details.
 

@@ -35,7 +35,7 @@ end
 
 function Xo:loadMonoGraph()
 
-    localDSP = {}
+    local localDSP = {}
     local sample = SamplePool.load("1:/ER-301/libs/Accents/assets/xoxo.wav")
 
     local tune = self:createObject("ConstantOffset","tune")

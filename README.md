@@ -25,6 +25,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * XOXOXO (California Stars)
 * XOXO (Hey Little Sister)
 * XO (Firm Handshake)
+* XXXXXX (6 op phase mod synth)
 
 For more details and discussion about these units, please visit:
 

@@ -42,7 +42,8 @@ local units = {
     {category="Synthesizers"},
     {title="Xoxoxo",moduleName="Xoxoxo",keywords="oscillator"},
     {title="Xoxo",moduleName="Xoxo",keywords="oscillator"},
-    {title="Xo",moduleName="Xo",keywords="oscillator"}
+    {title="Xo",moduleName="Xo",keywords="oscillator"},
+    {title="Xxxxxx",moduleName="Xxxxxx",keywords="oscillator"},
     
   }
   
