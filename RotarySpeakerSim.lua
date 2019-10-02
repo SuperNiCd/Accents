@@ -163,7 +163,7 @@ function RotarySim:onLoadViews(objects,branches)
     }
 
     controls.modLoLvl = GainBias {
-    button = "lo fast",
+    button = "lo freq",
     description = "Lo rotation freq",
     branch = branches.modLoLvl,
     gainbias = objects.modLoLvl,
