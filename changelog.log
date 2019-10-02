@@ -1,3 +1,6 @@
+2019-10-02 Accents v0.4.25.5
+NEW UNIT: Rotary Speaker Simulator
+
 2019-09-29 Accents v0.4.25.4
 ENHANCED: Small performance tweaks to XO synths.  Localized localDSP variable.
 FIXED: Flanger - capped feedback at 0.99 to prevent self-destruct mechanism

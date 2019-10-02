@@ -1,4 +1,4 @@
-# Accents v0.4.25.1
+# Accents v0.4.25.5
 This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It currently contains:
 
 * Ring Modulator
@@ -26,6 +26,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * XOXO (Hey Little Sister)
 * XO (Firm Handshake)
 * XXXXXX (6 op phase mod synth)
+* Rotary Speaker Simulator
 
 For more details and discussion about these units, please visit:
 
