@@ -38,6 +38,7 @@ local units = {
     {category="Experimental"},
     {title="AB Switch", moduleName="ABSwitch",keywords="control"},
     {title="Rotary Speaker Simulator", moduleName="RotarySpeakerSim",keywords="effect",channelCount=2},
+    {title="Phaser", moduleName="Phaser4",keywords="effect"},
     
 
     {category="Synthesizers"},
