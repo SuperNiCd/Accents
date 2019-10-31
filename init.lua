@@ -4,8 +4,7 @@ local units = {
     {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
 
     {category = "Delays and Reverb"},
-    {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
-    {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
+
 
     {category="Filtering"},
     {title="Ladder BPF",moduleName="BespokeBPF",keywords="filter"},
@@ -37,8 +36,7 @@ local units = {
     
     {category="Experimental"},
     {title="AB Switch", moduleName="ABSwitch",keywords="control"},
-    {title="Rotary Speaker Simulator", moduleName="RotarySpeakerSim",keywords="effect",channelCount=2},
-    {title="Phaser", moduleName="Phaser4",keywords="effect"},
+
     
 
     {category="Synthesizers"},
@@ -46,7 +44,12 @@ local units = {
     {title="Xoxo",moduleName="Xoxo",keywords="oscillator"},
     {title="Xo",moduleName="Xo",keywords="oscillator"},
     {title="Xxxxxx",moduleName="Xxxxxx",keywords="oscillator"},
-    
+
+    {category = "Audio Effects"},
+    {title="Rotary Speaker Simulator", moduleName="RotarySpeakerSim",keywords="effect",channelCount=2},
+    {title="Phaser", moduleName="Phaser4",keywords="effect"},
+    {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
+    {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
   }
   
   return {

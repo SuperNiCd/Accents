@@ -1,3 +1,13 @@
+2019-10-30 Accents v0.4.26.1
+NEW UNIT: Phaser
+ENCHANCED: XOXOXO (California Stars) now supports loading custom wavetables and editing waveforms
+FIXED: Units using builtin samples should now be agnostic to the library folder name
+JANITORIAL: Moved Accents units that are not generators and likely not all that useful for CV signals to a category called "Audio Effects"
+* Ensemble
+* Rotary Speaker Simulator
+* Flanger
+* Phaser
+
 2019-10-02 Accents v0.4.25.5
 NEW UNIT: Rotary Speaker Simulator
 

@@ -27,6 +27,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * XO (Firm Handshake)
 * XXXXXX (6 op phase mod synth)
 * Rotary Speaker Simulator
+* Phaser
 
 For more details and discussion about these units, please visit:
 
