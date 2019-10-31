@@ -36,7 +36,14 @@ end
 function Xoxo:loadMonoGraph()
 
     local localDSP = {}
-    local sample = SamplePool.load("1:/ER-301/libs/Accents/assets/xoxo.wav")
+    local libraryName = self.loadInfo.libraryName
+    local sampleFilename = Path.join("1:/ER-301/libs",libraryName,"assets/xoxo.wav")
+    local sample = SamplePool.load(sampleFilename)
+
+    if not sample then
+      local Overlay = require "Overlay"
+      Overlay.mainFlashMessage("Could not load %s.",sampleFilename)
+    end
 
     local tune = self:createObject("ConstantOffset","tune")
     local tuneRange = self:createObject("MinMax","tuneRange")

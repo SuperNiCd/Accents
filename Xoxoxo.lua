@@ -11,8 +11,10 @@ local SamplePool = require "Sample.Pool"
 local SamplePoolInterface = require "Sample.Pool.Interface"
 local SampleEditor = require "Sample.Editor"
 local Slices = require "Sample.Slices"
+local SlicingView = require "SlicingView"
 local Task = require "Unit.MenuControl.Task"
 local MenuHeader = require "Unit.MenuControl.Header"
+local Path = require "Path"
 local Encoder = require "Encoder"
 local ply = app.SECTION_PLY
 
@@ -36,7 +38,14 @@ end
 function Xoxoxo:loadMonoGraph()
 
     local localDSP = {}
-    local sample = SamplePool.load("1:/ER-301/libs/Accents/assets/xoxo.wav")
+    local libraryName = self.loadInfo.libraryName
+    local sampleFilename = Path.join("1:/ER-301/libs",libraryName,"assets/xoxo.wav")
+    local sample = SamplePool.load(sampleFilename)
+
+    if not sample then
+      local Overlay = require "Overlay"
+      Overlay.mainFlashMessage("Could not load %s.",sampleFilename)
+    end
 
     local tune = self:createObject("ConstantOffset","tune")
     local tuneRange = self:createObject("MinMax","tuneRange")
@@ -314,6 +323,79 @@ function Xoxoxo:onLoadViews(objects,branches)
   return controls, views
 end
 
+function Xoxoxo:setSample(sample)
+local opNames = {"A","B","C","D","E","F"}
+if self.sample then
+    self.sample:release(self)
+    self.sample = nil
+end
+self.sample = sample
+if self.sample then
+    self.sample:claim(self)
+end
+
+if sample==nil or sample:getChannelCount()==0 then
+    for i, name in ipairs(opNames) do
+        self.objects["op" .. name]:setSample(nil,nil)
+    end
+else
+    for i, name in ipairs(opNames) do
+        self.objects["op" .. name]:setSample(sample.pSample,sample.slices.pSlices)
+    end
+end
+
+if self.slicingView then
+    self.slicingView:setSample(sample)
+end
+self:notifyControls("setSample",sample)
+end
+
+function Xoxoxo:showSampleEditor()
+if self.sample then
+    if self.slicingView==nil then
+    self.slicingView = SlicingView(self,self.objects.opA)
+    self.slicingView:setSample(self.sample)
+    end
+    self.slicingView:show()
+else
+    local Overlay = require "Overlay"
+    Overlay.mainFlashMessage("You must first select a sample.")
+end
+end
+
+function Xoxoxo:doDetachSample()
+local Overlay = require "Overlay"
+Overlay.mainFlashMessage("Sample detached.")
+self:setSample()
+end
+
+function Xoxoxo:doAttachSampleFromCard()
+local task = function(sample)
+    if sample then
+    local Overlay = require "Overlay"
+    Overlay.mainFlashMessage("Attached sample: %s",sample.name)
+    self:setSample(sample)
+    end
+end
+local Pool = require "Sample.Pool"
+Pool.chooseFileFromCard(self.loadInfo.id,task)
+end
+
+function Xoxoxo:doAttachSampleFromPool()
+local chooser = SamplePoolInterface(self.loadInfo.id,"choose")
+chooser:setDefaultChannelCount(self.channelCount)
+chooser:highlight(self.sample)
+local task = function(sample)
+    if sample then
+    local Overlay = require "Overlay"
+    Overlay.mainFlashMessage("Attached sample: %s",sample.name)
+    self:setSample(sample)
+    end
+end
+chooser:subscribe("done",task)
+chooser:show()
+end
+
 local menu = {
     "title",
     "changeViews",
@@ -337,6 +419,11 @@ local menu = {
     "changeViewDIn",
     "changeViewEIn",
     "changeViewFIn",
+    "sampleHeader",
+    "selectFromCard",
+    "selectFromPool",
+    "detachBuffer",
+    "editSample",
     "infoHeader",
     "rename",
     "load",
@@ -457,8 +544,99 @@ end
         description = "track",
         task = function() self:changeView("track") end
     }
-  
-    return controls, menu
+    controls.sampleHeader = MenuHeader {
+        description = "Sample Menu"
+      }
+    
+    controls.selectFromCard = Task {
+    description = "Select from Card",
+    task = function() self:doAttachSampleFromCard() end
+    }
+
+    controls.selectFromPool = Task {
+    description = "Select from Pool",
+    task = function() self:doAttachSampleFromPool() end
+    }
+
+    controls.detachBuffer = Task {
+    description = "Detach Buffer",
+    task = function() self:doDetachSample() end
+    }
+
+    controls.editSample = Task {
+    description = "Edit Buffer",
+    task = function() self:showSampleEditor() end
+    }
+
+    local sub = {}
+    if self.sample then
+      sub[1] = {
+        position = app.GRID5_LINE1,
+        justify = app.justifyLeft,
+        text = "Attached Sample:"
+      }
+      sub[2] = {
+        position = app.GRID5_LINE2,
+        justify = app.justifyLeft,
+        text = "+ "..self.sample:getFilenameForDisplay(24)
+      }
+      sub[3] = {
+        position = app.GRID5_LINE3,
+        justify = app.justifyLeft,
+        text = "+ "..self.sample:getDurationText()
+      }
+      sub[4] = {
+        position = app.GRID5_LINE4,
+        justify = app.justifyLeft,
+        text = string.format("+ %s %s %s",self.sample:getChannelText(), self.sample:getSampleRateText(), self.sample:getMemorySizeText())
+      }
+    else
+      sub[1] = {
+        position = app.GRID5_LINE3,
+        justify = app.justifyCenter,
+        text = "No sample attached."
+      }
+    end
+    return controls, menu, sub
   end
+
+function Xoxoxo:serialize()
+local t = Unit.serialize(self)
+local sample = self.sample
+if sample then
+    t.sample = SamplePool.serializeSample(sample)
+end
+return t
+end
+
+function Xoxoxo:deserialize(t)
+Unit.deserialize(self,t)
+if t.sample then
+    local sample = SamplePool.deserializeSample(t.sample)
+    if sample then
+        self:setSample(sample)
+    else
+        local Utils = require "Utils"
+        app.log("%s:deserialize: failed to load sample.",self)
+        Utils.pp(t.sample)
+    end
+else
+    local libraryName = self.loadInfo.libraryName
+    local sampleFilename = Path.join("1:/ER-301/libs",libraryName,"assets/xoxo.wav")
+    local sample = SamplePool.load(sampleFilename)
+
+    if not sample then
+      local Overlay = require "Overlay"
+      Overlay.mainFlashMessage("Could not load %s.",sampleFilename)
+    else
+        self:setSample(sample)
+    end
+end
+end
+
+function Xoxoxo:onRemove()
+self:setSample(nil)
+Unit.onRemove(self)
+end
 
 return Xoxoxo
