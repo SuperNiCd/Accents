@@ -13,6 +13,7 @@ local SampleEditor = require "Sample.Editor"
 local Slices = require "Sample.Slices"
 local Task = require "Unit.MenuControl.Task"
 local MenuHeader = require "Unit.MenuControl.Header"
+local Path = require "Path"
 local Encoder = require "Encoder"
 local ply = app.SECTION_PLY
 
