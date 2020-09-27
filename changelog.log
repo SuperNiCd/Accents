@@ -1,3 +1,7 @@
+2029-09-27 Accents v0.5.03.1
+NEW UNIT: XFade
+NEW UNIT: Ladder BPF2 - changes bandwidth (BW) controller from log to linear response
+
 2019-11-14 Accents v0.4.26.2
 FIXED: Xoxo and Xo units not loading correctly
 

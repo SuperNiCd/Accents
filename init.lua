@@ -2,11 +2,13 @@ local units = {
 
     {category="Essentials"},
     {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility"},
+    {title="Xfade",moduleName="XFade",keywords="utility"},
 
     {category = "Delays and Reverb"},
 
 
     {category="Filtering"},
+    {title="Comb Filter",moduleName="CombFilter",keywords="filter"},
     {title="Ladder BPF",moduleName="BespokeBPF",keywords="filter"},
     {title="Scorpio Vocoder", moduleName="Scorpio", keywords="filter, modulate"},
 
@@ -29,6 +31,7 @@ local units = {
     {title="Voltage Bank 4",moduleName="VoltageBank4",keywords="mapping"},
     {title="Voltage Bank 2",moduleName="VoltageBank2",keywords="mapping"},
     {title="Octave CV Shifter", moduleName="OctaveCVShifter",keywords="mapping"},
+    {title="Inverse", moduleName="Inverse",keywords="mapping"},
 
     {category="Timing"},
     {title="Carousel Clock Divider",moduleName="CarouselClockDivider",keywords="timing"},
@@ -36,6 +39,7 @@ local units = {
     
     {category="Experimental"},
     {title="AB Switch", moduleName="ABSwitch",keywords="control"},
+    {title="Ladder BPF2",moduleName="LadderBPF",keywords="filter"},
 
     
 
@@ -50,6 +54,7 @@ local units = {
     {title="Phaser", moduleName="Phaser4",keywords="effect"},
     {title="Ensemble",moduleName="StereoEnsemble",keywords="modulate, pitch"},
     {title="Flanger",moduleName="Flanger",keywords="modulate, pitch"},
+    {title="Dirt",moduleName="Dirt",keywords="distortion"}
   }
   
   return {

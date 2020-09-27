@@ -1,4 +1,4 @@
-# Accents v0.4.26.2
+# Accents v0.5.03.1
 This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It currently contains:
 
 * Ring Modulator
@@ -28,6 +28,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * XXXXXX (6 op phase mod synth)
 * Rotary Speaker Simulator
 * Phaser
+* XFade
 
 For more details and discussion about these units, please visit:
 
