@@ -85,6 +85,14 @@ function BespokeBPF:onLoadGraph(channelCount)
   self:createMonoBranch("bw",bw,"In",bw,"Out")
 end
 
+local function linMap(min,max,superCoarse,coarse,fine,superFine)
+  local map = app.LinearDialMap(min,max)
+  map:setSteps(superCoarse,coarse,fine,superFine)
+  return map
+end
+
+local freqGainMap = linMap(0,13290,11000,100,10,1)
+
 local views = {
   expanded = {"tune","freq","resonance","bandwidth"},
   collapsed = {},
@@ -135,8 +143,7 @@ function BespokeBPF:onLoadViews(objects,branches)
     biasMap = Encoder.getMap("filterFreq"),
     biasUnits = app.unitHertz,
     initialBias = 1,
-    gainMap = Encoder.getMap("freqGain"),
-    -- scaling = app.octaveScaling
+    gainMap = freqGainMap
   }
 
   return controls, views
