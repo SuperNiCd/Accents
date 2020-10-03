@@ -29,6 +29,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Rotary Speaker Simulator
 * Phaser
 * XFade
+* Amie (Amplitude modulation synth)
 
 For more details and discussion about these units, please visit:
 

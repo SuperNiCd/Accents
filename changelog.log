@@ -1,4 +1,9 @@
-2029-09-27 Accents v0.5.03.1
+2020-10-03 Accents v0.5.03.2
+NEW UNIT: Amie
+FIXED: Ladder BPF2 Bandwidth control will reach max with max gain and 10V input
+FIXED: Corrected library units appearing in menu
+
+2020-09-27 Accents v0.5.03.1
 NEW UNIT: XFade
 NEW UNIT: Ladder BPF2 - changes bandwidth (BW) controller from log to linear response
 
