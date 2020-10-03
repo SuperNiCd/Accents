@@ -1,4 +1,4 @@
-# Accents v0.5.03.1
+# Accents v0.5.03.2
 This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It currently contains:
 
 * Ring Modulator
