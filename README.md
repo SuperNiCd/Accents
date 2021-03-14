@@ -1,6 +1,8 @@
-# Accents v0.6.00
+# Accents v0.6.02
 
-Minimum required firmware v0.6.02
+Minimum required firmware v0.6.03
+
+See changelog.log for detailed changes in each versoin.
 
 This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It currently contains:
 
@@ -17,9 +19,10 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Carousel Clock Divider
 * Maths
 * Logics
-* Voltage Bank
-* Voltage Bank 4
-* Voltage Bank 2
+* Voltage Bank (DEPRECATION NOTICE: Please replace with Votlage Vault)
+* Voltage Bank 4 (DEPRECATION NOTICE: Please replace with Votlage Vault)
+* Voltage Bank 2 (DEPRECATION NOTICE: Please replace with Votlage Vault)
+* Voltage Vault
 * Octave CV Shifter
 * Timed Gate
 * Scorpio Vocoder
@@ -36,5 +39,5 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 
 For more details and discussion about these units, please visit:
 
-https://forum.orthogonaldevices.com/t/some-new-units-to-share/1902
+https://forum.orthogonaldevices.com/t/accents-v0-6-x/5263?u=joe
 
