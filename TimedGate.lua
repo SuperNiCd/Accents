@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local GainBias = require "Unit.ViewControl.GainBias"
@@ -20,36 +20,36 @@ end
 
 function TimedGate:onLoadGraph(channelCount)
   --create objects
-  local skewedsin = self:createObject("SkewedSineEnvelope","skewedsin")
-  local limiter = self:createObject("Limiter","limiter")
-  local gain = self:createObject("Multiply","gain")
-  local thirtyK = self:createObject("Constant","thirtyK")
-  local durationSum = self:createObject("Sum","durationSum")
-  local retrigSum = self:createObject("Sum","retrigSum")
-  local invertVCA = self:createObject("Multiply","invertVCA")
-  local feedbackVCA = self:createObject("Multiply","feedbackVCA")
-  local negOne = self:createObject("Constant","negOne")
-  local one = self:createObject("Constant","one")
-  local feedbackConst = self:createObject("Constant","feedbackConst")
-  local durationAdapter = self:createObject("ParameterAdapter","durationAdapter")
-  local t1 = self:createObject("GainBias","t1")
-  local t2 = self:createObject("GainBias","t2")
-  local t1Range = self:createObject("MinMax","t1Range")
-  local t2Range = self:createObject("MinMax","t2Range")
-  local trig = self:createObject("Comparator","trig")
+  local skewedsin = self:addObject("skewedsin",libcore.SkewedSineEnvelope())
+  local limiter = self:addObject("limiter",libcore.Limiter())
+  local gain = self:addObject("gain",app.Multiply())
+  local thirtyK = self:addObject("thirtyK",app.Constant())
+  local durationSum = self:addObject("durationSum",app.Sum())
+  local retrigSum = self:addObject("retrigSum",app.Sum())
+  local invertVCA = self:addObject("invertVCA",app.Multiply())
+  local feedbackVCA = self:addObject("feedbackVCA",app.Multiply())
+  local negOne = self:addObject("negOne",app.Constant())
+  local one = self:addObject("one",app.Constant())
+  local feedbackConst = self:addObject("feedbackConst",app.Constant())
+  local durationAdapter = self:addObject("durationAdapter",app.ParameterAdapter())
+  local t1 = self:addObject("t1",app.GainBias())
+  local t2 = self:addObject("t2",app.GainBias())
+  local t1Range = self:addObject("t1Range",app.MinMax())
+  local t2Range = self:addObject("t2Range",app.MinMax())
+  local trig = self:addObject("trig",app.Comparator())
 
   trig:setTriggerMode()
   thirtyK:hardSet("Value",30000)
   negOne:hardSet("Value",-1.0)
   feedbackConst:hardSet("Value",1.0)
   durationAdapter:hardSet("Gain",1.0)
-  limiter:optionSet("Type",3)
+  limiter:setOptionValue("Type",3)
   one:hardSet("Value",1.0)
   skewedsin:hardSet("Skew",0.0)
 
   -- register exported ports
-  self:createMonoBranch("durs",t1,"In",t1,"Out")
-  self:createMonoBranch("durms",t2,"In",t2,"Out")
+  self:addMonoBranch("durs",t1,"In",t1,"Out")
+  self:addMonoBranch("durms",t2,"In",t2,"Out")
 
   -- connect objects
   connect(one,"Out",skewedsin,"Level")
@@ -141,7 +141,7 @@ local menu = {
   "edit"
 }
 
-function TimedGate:onLoadMenu(objects,branches)
+function TimedGate:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {

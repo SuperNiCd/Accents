@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Gate = require "Unit.ViewControl.Gate"
@@ -20,36 +20,36 @@ end
 
 function WeightedCoinToss:onLoadGraph(channelCount)
   --random block
-  local random=self:createObject("WhiteNoise","random")
-  local hold = self:createObject("TrackAndHold","hold")
-  local comparator = self:createObject("Comparator","comparator")
-  local rectify = self:createObject("Rectify","rectify")
+  local random=self:addObject("random",libcore.WhiteNoise())
+  local hold = self:addObject("hold",libcore.TrackAndHold())
+  local comparator = self:addObject("comparator",app.Comparator())
+  local rectify = self:addObject("rectify",libcore.Rectify())
 
   -- probability control block
-  local prob = self:createObject("ConstantOffset","prob")
-  local probOffset = self:createObject("ParameterAdapter","probOffset")
-  local one = self:createObject("Constant","one")
-  local negOne = self:createObject("Constant","negOne")
-  local sum1 = self:createObject("Sum","sum")
-  local invert = self:createObject("Multiply","invert")
-  local thresh = self:createObject("ParameterAdapter","thresh")
+  local prob = self:addObject("prob",app.ConstantOffset())
+  local probOffset = self:addObject("probOffset",app.ParameterAdapter())
+  local one = self:addObject("one",app.Constant())
+  local negOne = self:addObject("negOne",app.Constant())
+  local sum1 = self:addObject("sum",app.Sum())
+  local invert = self:addObject("invert",app.Multiply())
+  local thresh = self:addObject("thresh",app.ParameterAdapter())
 
   -- comparison block
-  local compare = self:createObject("Comparator","compare")
-  local thresh = self:createObject("ParameterAdapter","thresh")
-  local reset = self:createObject("Comparator","reset")
-  local sum = self:createObject("Sum","sum")
-  local flip = self:createObject("Multiply","flip")
+  local compare = self:addObject("compare",app.Comparator())
+  local thresh = self:addObject("thresh",app.ParameterAdapter())
+  local reset = self:addObject("reset",app.Comparator())
+  local sum = self:addObject("sum",app.Sum())
+  local flip = self:addObject("flip",app.Multiply())
 
   -- output control
-  local outputNegOne = self:createObject("Constant","outputNegOne")
-  local outputOffset = self:createObject("ConstantOffset","outputOffset")
-  local outputVCA = self:createObject("Multiply","outputVCA")
+  local outputNegOne = self:addObject("outputNegOne",app.Constant())
+  local outputOffset = self:addObject("outputOffset",app.ConstantOffset())
+  local outputVCA = self:addObject("outputVCA",app.Multiply())
 
   comparator:setTriggerMode()
   compare:setGateMode()
   reset:setTriggerMode()
-  rectify:optionSet("Type",3) --full rectification
+  rectify:setOptionValue("Type",3) --full rectification
   one:hardSet("Value",1.0)
   negOne:hardSet("Value",-1.0)
   thresh:hardSet("Gain",1.0)
@@ -57,8 +57,8 @@ function WeightedCoinToss:onLoadGraph(channelCount)
   outputOffset:hardSet("Offset",0.0)
 
   -- register exported ports
-  self:createMonoBranch("trig",comparator,"In",comparator,"Out")
-  self:createMonoBranch("prob",probOffset,"In",probOffset,"Out")
+  self:addMonoBranch("trig",comparator,"In",comparator,"Out")
+  self:addMonoBranch("prob",probOffset,"In",probOffset,"Out")
 
   -- connect objects
   connect(comparator,"Out",hold,"Track")
@@ -162,7 +162,7 @@ function WeightedCoinToss:deserialize(t)
   end
 end
 
-function WeightedCoinToss:onLoadMenu(objects,branches)
+function WeightedCoinToss:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {

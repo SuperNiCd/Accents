@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Fader = require "Unit.ViewControl.Fader"
@@ -21,27 +21,27 @@ function Flanger:init(args)
 end
 
 function Flanger:onLoadGraph(channelCount)
-    local s2m = channelCount > 1 and self:createObject("StereoToMono","s2m") or nil
-    local lfo1 = self:createObject("SineOscillator","lfo1")
-    local lfo1f0 = self:createObject("ConstantOffset","lfo1f0")
-    local lfo1f0Control = self:createObject("ParameterAdapter","lfo1f0Control")
-    local lfo1Gain = self:createObject("GainBias","lfo1Gain")
-    local lfo1Offset = self:createObject("ConstantOffset","lfo1Offset")
-    local delay1 = self:createObject("Delay","delay1",1)
-    local delay1time = self:createObject("ConstantOffset","delay1time")
-    local delay1adapter = self:createObject("ParameterAdapter","delay1adapter")
-    local dryMix = self:createObject("Sum","dryMix")
-    local amtVCA = self:createObject("Multiply","amtVCA")
-    local amtVCALevel = self:createObject("ConstantOffset","amtVCALevel")
-    local amtVCALevelControl = self:createObject("ParameterAdapter","amtVCALevelControl")
-    local fdbk = self:createObject("GainBias","fdbk")
-    local wetVCA = self:createObject("Multiply","wetVCA")
-    local dryVCA = self:createObject("Multiply","dryVCA")
-    local wet = self:createObject("GainBias","wet")
-    local one = self:createObject("ConstantOffset","one")
-    local negone = self:createObject("ConstantOffset","negone")
-    local invert = self:createObject("Multiply","invert")
-    local drySum = self:createObject("Sum","drySum")
+    local s2m = channelCount > 1 and self:addObject("s2m",app.StereoToMono()) or nil
+    local lfo1 = self:addObject("lfo1",libcore.SineOscillator())
+    local lfo1f0 = self:addObject("lfo1f0",app.ConstantOffset())
+    local lfo1f0Control = self:addObject("lfo1f0Control",app.ParameterAdapter())
+    local lfo1Gain = self:addObject("lfo1Gain",app.GainBias())
+    local lfo1Offset = self:addObject("lfo1Offset",app.ConstantOffset())
+    local delay1 = self:addObject("delay1",libcore.Delay(1))
+    local delay1time = self:addObject("delay1time",app.ConstantOffset())
+    local delay1adapter = self:addObject("delay1adapter",app.ParameterAdapter())
+    local dryMix = self:addObject("dryMix",app.Sum())
+    local amtVCA = self:addObject("amtVCA",app.Multiply())
+    local amtVCALevel = self:addObject("amtVCALevel",app.ConstantOffset())
+    local amtVCALevelControl = self:addObject("amtVCALevelControl",app.ParameterAdapter())
+    local fdbk = self:addObject("fdbk",app.GainBias())
+    local wetVCA = self:addObject("wetVCA",app.Multiply())
+    local dryVCA = self:addObject("dryVCA",app.Multiply())
+    local wet = self:addObject("wet",app.GainBias())
+    local one = self:addObject("one",app.ConstantOffset())
+    local negone = self:addObject("negone",app.ConstantOffset())
+    local invert = self:addObject("invert",app.Multiply())
+    local drySum = self:addObject("drySum",app.Sum())
 
     delay1time:hardSet("Offset",0.0025)
     delay1adapter:hardSet("Gain",0.0025)
@@ -56,10 +56,10 @@ function Flanger:onLoadGraph(channelCount)
     tie(amtVCALevel,"Offset",amtVCALevelControl,"Out")
     tie(delay1,"Left Delay",delay1adapter,"Out")
 
-    self:createMonoBranch("amt",amtVCALevelControl,"In",amtVCALevelControl,"Out")
-    self:createMonoBranch("rate",lfo1f0Control,"In",lfo1f0Control,"Out")
-    self:createMonoBranch("feedback",fdbk,"In",fdbk,"Out")
-    self:createMonoBranch("wet",wet,"In",wet,"Out")
+    self:addMonoBranch("amt",amtVCALevelControl,"In",amtVCALevelControl,"Out")
+    self:addMonoBranch("rate",lfo1f0Control,"In",lfo1f0Control,"Out")
+    self:addMonoBranch("feedback",fdbk,"In",fdbk,"Out")
+    self:addMonoBranch("wet",wet,"In",wet,"Out")
 
     connect(lfo1f0,"Out",lfo1,"Fundamental")
     connect(lfo1,"Out",lfo1Gain,"In")
@@ -115,7 +115,7 @@ local menu = {
   "edit"
 }
 
-function Flanger:onLoadMenu(objects,branches)
+function Flanger:onShowMenu(objects,branches)
   local controls = {}
 
   if objects.s2m then

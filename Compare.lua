@@ -1,4 +1,3 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
 local Class = require "Base.Class"
 local Unit = require "Unit"
@@ -20,17 +19,17 @@ end
 
 function CompareUnit:onLoadGraph()
   -- create objects
-  local compare = self:createObject("Comparator","compare")
-  local threshold = self:createObject("ParameterAdapter","threshold")
-  local hysteresis = self:createObject("ParameterAdapter","hysteresis")
+  local compare = self:addObject("compare",app.Comparator())
+  local threshold = self:addObject("threshold",app.ParameterAdapter())
+  local hysteresis = self:addObject("hysteresis",app.ParameterAdapter())
   -- connect inputs/outputs
   connect(self,"In1",compare,"In")
   connect(compare,"Out",self,"Out1")
 
   tie(compare,"Hysteresis",hysteresis,"Out")
-  self:createMonoBranch("hyst",hysteresis,"In",hysteresis,"Out")
+  self:addMonoBranch("hyst",hysteresis,"In",hysteresis,"Out")
   tie(compare,"Threshold", threshold, "Out")
-  self:createMonoBranch("thresh",threshold,"In",threshold,"Out")
+  self:addMonoBranch("thresh",threshold,"In",threshold,"Out")
 end
 
 local views = {

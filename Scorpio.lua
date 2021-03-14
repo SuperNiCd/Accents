@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local BranchMeter = require "Unit.ViewControl.BranchMeter"
@@ -31,44 +31,44 @@ local bw = (5000-300)/numBands
 function Scorpio:onLoadGraph(channelCount)
 
     -- create the carrier subchain and level control
-    local sum = self:createObject("Sum","sum")
-    local gain = self:createObject("ConstantGain","gain")
+    local sum = self:addObject("sum",app.Sum())
+    local gain = self:addObject("gain",app.ConstantGain())
     gain:setClampInDecibels(-59.9)
     gain:hardSet("Gain",1.0)
 
     -- create a fixed HPF for the modulator - 20 Hz DC blocker
-    local inputHPF = self:createObject("StereoFixedHPF","inputHPF")
-    local inputHPFf0 = self:createObject("GainBias","inputHPFf0")
+    local inputHPF = self:addObject("inputHPF",libcore.StereoFixedHPF())
+    local inputHPFf0 = self:addObject("inputHPFf0",app.GainBias())
     inputHPFf0:hardSet("Bias",20.0)
 
     -- create an output (make up) gain and control
-    local outputGain = self:createObject("Multiply","outputGain")
-    local outputLevel = self:createObject("GainBias","outputLevel")
-    local outputLevelRange = self:createObject("MinMax","outputLevelRange")
+    local outputGain = self:addObject("outputGain",app.Multiply())
+    local outputLevel = self:addObject("outputLevel",app.GainBias())
+    local outputLevelRange = self:addObject("outputLevelRange",app.MinMax())
 
     -- create envelope follower controls - this will adjust attack and decay for all envelope followers together
-    local envelope = self:createObject("ParameterAdapter", "envelope")
+    local envelope = self:addObject("envelope",app.ParameterAdapter())
 
     -- create resonance (Q) controls for input and output BPFs
-    local qIn = self:createObject("GainBias", "qIn")
-    local qOut = self:createObject("GainBias", "qOut")
-    local qInRange = self:createObject("MinMax", "qInRange")
-    local qOutRange = self:createObject("MinMax", "qOutRange")
+    local qIn = self:addObject("qIn",app.GainBias())
+    local qOut = self:addObject("qOut",app.GainBias())
+    local qInRange = self:addObject("qInRange",app.MinMax())
+    local qOutRange = self:addObject("qOutRange",app.MinMax())
 
     -- create a fixed HPF for the modulator output mix
-    local outputHPF = self:createObject("StereoLadderHPF","outputHPF")
-    local outputHPFf0 = self:createObject("GainBias","outputHPFf0")
-    local outputHPFf0Range = self:createObject("MinMax","outputHPFf0Range")
+    local outputHPF = self:addObject("outputHPF",libcore.StereoLadderHPF())
+    local outputHPFf0 = self:addObject("outputHPFf0",app.GainBias())
+    local outputHPFf0Range = self:addObject("outputHPFf0Range",app.MinMax())
 
     -- create a mixer for the modulator output
-    local outputModMix = self:createObject("Sum","outputModMix")
-    local outputModLevel = self:createObject("GainBias","outputModLevel")
-    local outputModGain = self:createObject("Multiply","outputModGain")
-    local outputModLevelRange = self:createObject("MinMax", "outputModLevelRange")
+    local outputModMix = self:addObject("outputModMix",app.Sum())
+    local outputModLevel = self:addObject("outputModLevel",app.GainBias())
+    local outputModGain = self:addObject("outputModGain",app.Multiply())
+    local outputModLevelRange = self:addObject("outputModLevelRange",app.MinMax())
 
     -- create the fshift tune control
-    local fshifttune = self:createObject("ConstantOffset","tune")
-    local fshifttuneRange = self:createObject("MinMax","tuneRange")
+    local fshifttune = self:addObject("tune",app.ConstantOffset())
+    local fshifttuneRange = self:addObject("tuneRange",app.MinMax())
     connect(fshifttune,"Out",fshifttuneRange,"In")
     
 
@@ -91,17 +91,26 @@ function Scorpio:onLoadGraph(channelCount)
 
      -- create numBands # instances of each object in objectList
      -- loop throuhgh the Key - Value pairs in the objectList array
-    for k, v in pairs(objectList) do
+    -- for k, v in pairs(objectList) do
       -- set i to be equal to 1 and loop intil i reaches the number of bands - numBands - in this case 10
       for i = 1, numBands do
          -- create the object name by concatenating the key value and i e.g. lpI .. 1, lpI .. 2
-        local dynamicVar = k .. i
+        -- local dynamicVar = k .. i
         -- create the dsp unit name, because objectList is a multidimentinal array access the first element
-        local dynamicDSPUnit = v[1]
+        -- local dynamicDSPUnit = v[1]
         -- create a table to store the new objects and create the object using the values created
-        localVars[dynamicVar] = self:createObject(dynamicDSPUnit,dynamicVar)
+        -- localVars[dynamicVar] = self:addObject(dynamicDSPUnit,dynamicVar)
+        localVars["lpI" ..i] = self:addObject("lpI" .. i,libcore.StereoLadderFilter())
+        localVars["hpI" ..i] = self:addObject("hpI" .. i,libcore.StereoLadderHPF())
+        localVars["lpO" ..i] = self:addObject("lpO" .. i,libcore.StereoLadderFilter())
+        localVars["hpO" ..i] = self:addObject("hpO" .. i,libcore.StereoLadderHPF())
+        localVars["ef" ..i] = self:addObject("ef" .. i,libcore.EnvelopeFollower())
+        localVars["bpf0" ..i] = self:addObject("bpf0" .. i,app.GainBias())
+        localVars["bpf0Range" ..i] = self:addObject("bpf0Range" .. i,app.MinMax())
+        localVars["ogain" ..i] = self:addObject("ogain" .. i,app.Multiply())
+        localVars["omix" ..i] = self:addObject("omix" .. i,app.Sum())
       end
-    end
+    -- end
 
     -- connect modulator (unit input) to fixed HPF
     connect(self,"In1",inputHPF,"Left In")
@@ -199,17 +208,17 @@ function Scorpio:onLoadGraph(channelCount)
      end
     
     -- register exported ports
-    self:createMonoBranch("input",gain, "In", gain,"Out")
-    self:createMonoBranch("envelope",envelope,"In", envelope,"Out")
-    self:createMonoBranch("qIn",qIn,"In",qIn,"Out")
-    self:createMonoBranch("qOut",qOut,"In",qOut,"Out")
-    self:createMonoBranch("outputLevel",outputLevel,"In",outputLevel,"Out")
-    self:createMonoBranch("fshift",fshifttune,"In",fshifttune,"Out")
-    self:createMonoBranch("hpModMix",outputModLevel,"In",outputModLevel,"Out")
-    self:createMonoBranch("hpModf0",inputHPFf0,"In",inputHPFf0,"Out")
+    self:addMonoBranch("input",gain, "In", gain,"Out")
+    self:addMonoBranch("envelope",envelope,"In", envelope,"Out")
+    self:addMonoBranch("qIn",qIn,"In",qIn,"Out")
+    self:addMonoBranch("qOut",qOut,"In",qOut,"Out")
+    self:addMonoBranch("outputLevel",outputLevel,"In",outputLevel,"Out")
+    self:addMonoBranch("fshift",fshifttune,"In",fshifttune,"Out")
+    self:addMonoBranch("hpModMix",outputModLevel,"In",outputModLevel,"Out")
+    self:addMonoBranch("hpModf0",inputHPFf0,"In",inputHPFf0,"Out")
 
     for i = 1,numBands do
-      self:createMonoBranch("bpf0" .. i,localVars["bpf0" .. i],"In",localVars["bpf0" .. i],"Out")
+      self:addMonoBranch("bpf0" .. i,localVars["bpf0" .. i],"In",localVars["bpf0" .. i],"Out")
     end
 end
 
@@ -359,7 +368,7 @@ local menu = {
   "save"
 }
 
-function Scorpio:onLoadMenu(objects,branches)
+function Scorpio:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {

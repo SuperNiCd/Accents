@@ -1,3 +1,20 @@
+2021-03-13 Accents v0.6.02
+FIXED: Fixed Xo, Xoxo, Xoxoxo, Phaser units which I broke in 0.6.01
+FIXED: Xfade crossfade parameter was a bit backward with 0 being full volume for b
+ENHANCED: Voltage Vault - more storage slots (128 indices).  More efficiency (~0.7% CPU usage)
+ENHANCED: Maths unit rebuilt with a c++ implementation (~0.4% CPU).  New ops: DIV, INV, MOD, TANH, ATAN
+
+2021-03-08 Accents v0.6.01
+NEW UNIT: Voltage Vault
+
+2021-03-04 Accents v0.6.00
+UPDATE: All units upgraded for compatibility with 0.6.x firmware
+FIXED: XFade unit xfade subchain did not provide signal to control
+JANITORIAL: Bespoke BPF renamed to Ladder BPF
+JANITORIAL: XFade unit moved to Essentials
+JANITORIAL: XXXXXX renamed to Phase Mod Matrix
+
+
 2020-10-03 Accents v0.5.03.2
 NEW UNIT: Amie
 FIXED: Ladder BPF2 Bandwidth control will reach max with max gain and 10V input

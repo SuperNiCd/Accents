@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local ModeSelect = require "Unit.ViewControl.OptionControl"
@@ -21,27 +21,27 @@ end
 
 function MotionSensor:onLoadGraph()
   -- create objects
-  local compare = self:createObject("Comparator","compare")
-  local invert = self:createObject("Multiply","invert")
-  local negOne = self:createObject("Constant","negOne")
-  local sum = self:createObject("Sum","sum")
-  local rectify = self:createObject("Rectify","rectify")
-  local delay = self:createObject("Delay","delay",1)
-  local env = self:createObject("EnvelopeFollower","env")
-  local release = self:createObject("ParameterAdapter","release")
-  local attack = self:createObject("ParameterAdapter","attack")
-  local pregain = self:createObject("Multiply","pregain")
-  local preGainAmt = self:createObject("Constant","preGainAmt")
-  local gain = self:createObject("Multiply","gain")
-  local level = self:createObject("GainBias","level")
-  local levelRange = self:createObject("MinMax","levelRange")
+  local compare = self:addObject("compare",app.Comparator())
+  local invert = self:addObject("invert",app.Multiply())
+  local negOne = self:addObject("negOne",app.Constant())
+  local sum = self:addObject("sum",app.Sum())
+  local rectify = self:addObject("rectify",libcore.Rectify())
+  local delay = self:addObject("delay",libcore.Delay(1))
+  local env = self:addObject("env",libcore.EnvelopeFollower())
+  local release = self:addObject("release",app.ParameterAdapter())
+  local attack = self:addObject("attack",app.ParameterAdapter())
+  local pregain = self:addObject("pregain",app.Multiply())
+  local preGainAmt = self:addObject("preGainAmt",app.Constant())
+  local gain = self:addObject("gain",app.Multiply())
+  local level = self:addObject("level",app.GainBias())
+  local levelRange = self:addObject("levelRange",app.MinMax())
 
   -- set parameters
   compare:setGateMode()
   compare:hardSet("Threshold",0.010)
   compare:hardSet("Hysteresis",0.00)
   negOne:hardSet("Value",-1.0)
-  rectify:optionSet("Type",3) --full rectification
+  rectify:setOptionValue("Type",3) --full rectification
   self:setMaxDelayTime(0.1)
   delay:hardSet("Left Delay",0.001)
   preGainAmt:hardSet("Value",4.0)
@@ -67,9 +67,9 @@ function MotionSensor:onLoadGraph()
   tie(env,"Attack Time",attack,"Out")
 
   -- register exported ports
-  self:createMonoBranch("release",release,"In",release,"Out")
-  self:createMonoBranch("attack",attack,"In",attack,"Out")
-  self:createMonoBranch("level",level,"In",level,"Out")
+  self:addMonoBranch("release",release,"In",release,"Out")
+  self:addMonoBranch("attack",attack,"In",attack,"Out")
+  self:addMonoBranch("level",level,"In",level,"Out")
 end
 
 local views = {

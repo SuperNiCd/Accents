@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local ModeSelect = require "Unit.ViewControl.OptionControl"
@@ -20,31 +20,31 @@ function ABSwitch:init(args)
 end
 
 function ABSwitch:onLoadGraph(channelCount)
-  local a = self:createObject("ConstantGain","a")
-  local b = self:createObject("ConstantGain","b")
-  local sum = self:createObject("Sum","sum")
+  local a = self:addObject("a",app.ConstantGain())
+  local b = self:addObject("b",app.ConstantGain())
+  local sum = self:addObject("sum",app.Sum())
   a:hardSet("Gain",1.0)
   b:hardSet("Gain",1.0)
   a:setClampInDecibels(-59.9)
   b:setClampInDecibels(-59.9)
-  self:createMonoBranch("inA", a, "In", a,"Out")
-  self:createMonoBranch("inB", b, "In", b,"Out")
+  self:addMonoBranch("inA", a, "In", a,"Out")
+  self:addMonoBranch("inB", b, "In", b,"Out")
 
   
-  local one = self:createObject("Constant","one")
+  local one = self:addObject("one",app.Constant())
   one:hardSet("Value",1.0)
-  local negOne = self:createObject("Constant","negOne")
+  local negOne = self:addObject("negOne",app.Constant())
   negOne:hardSet("Value",-1.0)
-  local invert = self:createObject("Multiply","invert")
-  local sub = self:createObject("Sum","sub")
-  local vcaA = self:createObject("Multiply","vcaA")
-  local vcaB = self:createObject("Multiply","vcaB")
+  local invert = self:addObject("invert",app.Multiply())
+  local sub = self:addObject("sub",app.Sum())
+  local vcaA = self:addObject("vcaA",app.Multiply())
+  local vcaB = self:addObject("vcaB",app.Multiply())
 
-  local ab = self:createObject("Comparator","ab")
+  local ab = self:addObject("ab",app.Comparator())
   ab:setToggleMode()
 
 
-  self:createMonoBranch("ab",ab,"In",ab,"Out")
+  self:addMonoBranch("ab",ab,"In",ab,"Out")
     
   connect(b,"Out",vcaA,"Left")
   connect(ab,"Out",vcaA,"Right")

@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local GainBias = require "Unit.ViewControl.GainBias"
@@ -24,13 +24,13 @@ function LinearSamplingVCA:onLoadGraph(channelCount)
 end
 
 function LinearSamplingVCA:loadMonoGraph()
-  local vca = self:createObject("Multiply","vca")
-  local level = self:createObject("GainBias","level")
-  local levelRange = self:createObject("MinMax","levelRange")
-  local compareRise = self:createObject("Comparator","compareRise")
-  local compareFall = self:createObject("Comparator","compareFall")
-  local sh = self:createObject("TrackAndHold","sh")
-  local mixer = self:createObject("Sum","mixer")
+  local vca = self:addObject("vca",app.Multiply())
+  local level = self:addObject("level",app.GainBias())
+  local levelRange = self:addObject("levelRange",app.MinMax())
+  local compareRise = self:addObject("compareRise",app.Comparator())
+  local compareFall = self:addObject("compareFall",app.Comparator())
+  local sh = self:addObject("sh",libcore.TrackAndHold())
+  local mixer = self:addObject("mixer",app.Sum())
 
   compareRise:setTriggerOnRiseMode()
   compareRise:hardSet("Threshold",0.0)
@@ -52,23 +52,23 @@ function LinearSamplingVCA:loadMonoGraph()
   connect(self,"In1",vca,"Right")
   connect(vca,"Out",self,"Out1")
 
-  self:createMonoBranch("level",level,"In",level,"Out")
+  self:addMonoBranch("level",level,"In",level,"Out")
 end
 
 function LinearSamplingVCA:loadStereoGraph()
-  local vca1 = self:createObject("Multiply","vca1")
-  local vca2 = self:createObject("Multiply","vca2")
-  local level = self:createObject("GainBias","level")
-  local levelRange = self:createObject("MinMax","levelRange")
+  local vca1 = self:addObject("vca1",app.Multiply())
+  local vca2 = self:addObject("vca2",app.Multiply())
+  local level = self:addObject("level",app.GainBias())
+  local levelRange = self:addObject("levelRange",app.MinMax())
 
-  local balance = self:createObject("StereoPanner","balance")
-  local pan = self:createObject("GainBias","pan")
-  local panRange = self:createObject("MinMax","panRange")
+  local balance = self:addObject("balance",app.StereoPanner())
+  local pan = self:addObject("pan",app.GainBias())
+  local panRange = self:addObject("panRange",app.MinMax())
 
-  local compareRise = self:createObject("Comparator","compareRise")
-  local compareFall = self:createObject("Comparator","compareFall")
-  local sh = self:createObject("TrackAndHold","sh")
-  local mixer = self:createObject("Sum","mixer")
+  local compareRise = self:addObject("compareRise",app.Comparator())
+  local compareFall = self:addObject("compareFall",app.Comparator())
+  local sh = self:addObject("sh",libcore.TrackAndHold())
+  local mixer = self:addObject("mixer",app.Sum())
 
   compareRise:setTriggerOnRiseMode()
   compareRise:hardSet("Threshold",0.0)
@@ -100,8 +100,8 @@ function LinearSamplingVCA:loadStereoGraph()
   connect(pan,"Out",balance,"Pan")
   connect(pan,"Out",panRange,"In")
 
-  self:createMonoBranch("level",level,"In",level,"Out")
-  self:createMonoBranch("pan", pan, "In", pan,"Out")
+  self:addMonoBranch("level",level,"In",level,"Out")
+  self:addMonoBranch("pan", pan, "In", pan,"Out")
 end
 
 function LinearSamplingVCA:onLoadViews(objects,branches)

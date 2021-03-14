@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local ModeSelect = require "Unit.ViewControl.OptionControl"
@@ -20,29 +20,29 @@ function XFade:init(args)
 end
 
 function XFade:onLoadGraph(channelCount)
-  local a = self:createObject("ConstantGain","a")
-  local b = self:createObject("ConstantGain","b")
-  local crossfade = self:createObject("CrossFade","crossfade")
+  local a = self:addObject("a",app.ConstantGain())
+  local b = self:addObject("b",app.ConstantGain())
+  local crossfade = self:addObject("crossfade",app.CrossFade())
   a:hardSet("Gain",1.0)
   b:hardSet("Gain",1.0)
   a:setClampInDecibels(-59.9)
   b:setClampInDecibels(-59.9)
-  local level = self:createObject("GainBias","level")
-  local levelRange = self:createObject("MinMax","levelRange")
-  self:createMonoBranch("inA", a, "In", a,"Out")
-  self:createMonoBranch("inB", b, "In", b,"Out")
-  self:createMonoBranch("xfade",crossfade,"In",crossfade,"Out")
+  local level = self:addObject("level",app.GainBias())
+  local levelRange = self:addObject("levelRange",app.MinMax())
+  self:addMonoBranch("inA", a, "In", a,"Out")
+  self:addMonoBranch("inB", b, "In", b,"Out")
+  self:addMonoBranch("xfade",level,"In",level,"Out")
 
---   local vcaA = self:createObject("Multiply","vcaA")
---   local vcaB = self:createObject("Multiply","vcaB")
+--   local vcaA = self:addObject("Multiply","vcaA")
+--   local vcaB = self:addObject("Multiply","vcaB")
 
 
 
 
 --   connect(a,"Out",vcaB,"Left")
 --   connect(b,"Out",vcaA,"Left")
-  connect(a,"Out",crossfade,"A")
-  connect(b,"Out",crossfade,"B") 
+  connect(a,"Out",crossfade,"B")
+  connect(b,"Out",crossfade,"A") 
   connect(level,"Out",levelRange,"In")
   connect(level,"Out",crossfade,"Fade")
   connect(crossfade,"Out",self,"Out1")

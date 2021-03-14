@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Gate = require "Unit.ViewControl.Gate"
@@ -23,20 +23,20 @@ end
 function PingableScaledRandom:onLoadGraph(channelCount)
 
   --random block
-  local random=self:createObject("WhiteNoise","random")
-  local hold = self:createObject("TrackAndHold","hold")
-  local comparator = self:createObject("Comparator","comparator")
-  local scale = self:createObject("Multiply","scale")
-  local scaleAmt = self:createObject("ConstantOffset","scaleAmt")
-  local scaleLevel = self:createObject("ParameterAdapter","scaleLevel")
-  local offset = self:createObject("ConstantOffset","offset")
-  local offsetLevel = self:createObject("ParameterAdapter","offsetLevel")
-  local quantize = self:createObject("GridQuantizer", "quantize")
-  local quantVCA = self:createObject("Multiply", "quantVCA")
-  local noQuantVCA = self:createObject("Multiply","noQuantVCA")
-  local mix = self:createObject("Sum","mix")
-  local quantVCASelector = self:createObject("Constant","quantVCASelector")
-  local noQuantVCASelector = self:createObject("Constant","noQuantVCASelector")
+  local random=self:addObject("random",libcore.WhiteNoise())
+  local hold = self:addObject("hold",libcore.TrackAndHold())
+  local comparator = self:addObject("comparator",app.Comparator())
+  local scale = self:addObject("scale",app.Multiply())
+  local scaleAmt = self:addObject("scaleAmt",app.ConstantOffset())
+  local scaleLevel = self:addObject("scaleLevel",app.ParameterAdapter())
+  local offset = self:addObject("offset",app.ConstantOffset())
+  local offsetLevel = self:addObject("offsetLevel",app.ParameterAdapter())
+  local quantize = self:addObject("quantize",libcore.GridQuantizer())
+  local quantVCA = self:addObject("quantVCA",app.Multiply())
+  local noQuantVCA = self:addObject("noQuantVCA",app.Multiply())
+  local mix = self:addObject("mix",app.Sum())
+  local quantVCASelector = self:addObject("quantVCASelector",app.Constant())
+  local noQuantVCASelector = self:addObject("noQuantVCASelector",app.Constant())
 
   comparator:setTriggerMode()
   quantVCASelector:hardSet("Value",0.0)
@@ -68,9 +68,9 @@ function PingableScaledRandom:onLoadGraph(channelCount)
   end
 
   -- register exported ports
-  self:createMonoBranch("trig",comparator,"In",comparator,"Out")
-  self:createMonoBranch("scalelvl",scaleLevel,"In",scaleLevel,"Out")
-  self:createMonoBranch("offset",offsetLevel,"In",offsetLevel,"Out")
+  self:addMonoBranch("trig",comparator,"In",comparator,"Out")
+  self:addMonoBranch("scalelvl",scaleLevel,"In",scaleLevel,"Out")
+  self:addMonoBranch("offset",offsetLevel,"In",offsetLevel,"Out")
 end
 
 local views = {
@@ -138,7 +138,7 @@ local menu = {
   "save"
 }
 
-function PingableScaledRandom:onLoadMenu(objects,branches)
+function PingableScaledRandom:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {

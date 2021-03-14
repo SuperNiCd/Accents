@@ -1,5 +1,5 @@
--- luacheck: globals app os verboseLevel connect tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Fader = require "Unit.ViewControl.Fader"
@@ -14,6 +14,7 @@ local Slices = require "Sample.Slices"
 local Path = require "Path"
 local Encoder = require "Encoder"
 local Utils = require "Utils"
+local Accents = require "Accents"
 local ply = app.SECTION_PLY
 
 local Phaser4 = Class{}
@@ -36,21 +37,21 @@ function Phaser4:onLoadGraph(channelCount)
 function Phaser4:loadStereoGraph()
     self:loadMonoGraph()
     local localDSP = {}
-    local dryVCAR = self:createObject("Multiply","dryVCAR")
-    local wetVCAR = self:createObject("Multiply","wetVCAR")
-    local outSumR = self:createObject("Sum","outSumR")
+    local dryVCAR = self:addObject("dryVCAR",app.Multiply())
+    local wetVCAR = self:addObject("wetVCAR",app.Multiply())
+    local outSumR = self:addObject("outSumR",app.Sum())
 
-    local modPhase = self:createObject("Delay","modPhase",1)
+    local modPhase = self:addObject("modPhase",libcore.Delay(1))
     modPhase:allocateTimeUpTo(0.25)
     modPhase:hardSet("Left Delay", 0.25)
 
     for i = 1,4 do 
-        localDSP["feedBackMixR" .. i] = self:createObject("Sum","feedBackMixR" .. i)
-        localDSP["feedBackGainR" .. i] = self:createObject("ConstantGain","feedBackGainR" .. i)
-        localDSP["feedForwardMixR" .. i] = self:createObject("Sum","feedForwardMixR" .. i)
-        localDSP["feedForwardGainR" .. i] = self:createObject("ConstantGain","feedForwardGainR" .. i)
-        localDSP["limiterR" .. i] = self:createObject("Limiter","limiterR" .. i)
-        localDSP["modGainBiasR" .. i] = self:createObject("ParameterAdapter","modGainBiasR" ..i)
+        localDSP["feedBackMixR" .. i] = self:addObject("feedBackMixR" .. i,app.Sum())
+        localDSP["feedBackGainR" .. i] = self:addObject("feedBackGainR" .. i,app.ConstantGain())
+        localDSP["feedForwardMixR" .. i] = self:addObject("feedForwardMixR" .. i,app.Sum())
+        localDSP["feedForwardGainR" .. i] = self:addObject("feedForwardGainR" .. i,app.ConstantGain())
+        localDSP["limiterR" .. i] = self:addObject("limiterR" .. i,libcore.Limiter())
+        localDSP["modGainBiasR" .. i] = self:addObject("modGainBiasR" ..i,app.ParameterAdapter())
         localDSP["modGainBiasR" .. i]:hardSet("Bias", (i*.001) + .001)
         localDSP["modGainBiasR" .. i]:hardSet("Gain", .002)
 
@@ -86,15 +87,15 @@ function Phaser4:loadStereoGraph()
 function Phaser4:loadMonoGraph()
 
     local localDSP = {}
-    local delayAdapter = self:createObject("ParameterAdapter","delayAdapter")
-    local gainAdapter = self:createObject("ParameterAdapter","gainAdapter")
+    local delayAdapter = self:addObject("delayAdapter",app.ParameterAdapter())
+    local gainAdapter = self:addObject("gainAdapter",app.ParameterAdapter())
     gainAdapter:hardSet("Gain",0.3)
-    local mod = self:createObject("SingleCycle","mod")
-    local f0Range = self:createObject("MinMax","f0Range")
-    local f0 = self:createObject("GainBias","f0")
+    local mod = self:addObject("mod",libcore.SingleCycle())
+    local f0Range = self:addObject("f0Range",app.MinMax())
+    local f0 = self:addObject("f0",app.GainBias())
 
     local libraryName = self.loadInfo.libraryName
-    local sampleFilename = Path.join("1:/ER-301/libs",libraryName,"assets/xoxo.wav")
+    local sampleFilename = Path.join(Accents:getInstallationPath(),"xoxo.wav")
     local sample = SamplePool.load(sampleFilename)
 
     if not sample then
@@ -105,23 +106,23 @@ function Phaser4:loadMonoGraph()
     end
 
 
-    local wetLevel = self:createObject("GainBias","wetLevel")
-    local wetLevelRange = self:createObject("MinMax","wetLevelRange")
-    local one = self:createObject("Constant","one")
-    local negOne = self:createObject("Constant","negOne")
+    local wetLevel = self:addObject("wetLevel",app.GainBias())
+    local wetLevelRange = self:addObject("wetLevelRange",app.MinMax())
+    local one = self:addObject("one",app.Constant())
+    local negOne = self:addObject("negOne",app.Constant())
     one:hardSet("Value", 1.0)
     negOne:hardSet("Value", -1.0)
-    local invertingVCA = self:createObject("Multiply","invertingVCA")
-    local dryVCA = self:createObject("Multiply","dryVCA")
-    local wetVCA = self:createObject("Multiply","wetVCA")
-    local dryLevelSum = self:createObject("Sum","dryLevelSum")
-    local outSum = self:createObject("Sum","outSum")
+    local invertingVCA = self:addObject("invertingVCA",app.Multiply())
+    local dryVCA = self:addObject("dryVCA",app.Multiply())
+    local wetVCA = self:addObject("wetVCA",app.Multiply())
+    local dryLevelSum = self:addObject("dryLevelSum",app.Sum())
+    local outSum = self:addObject("outSum",app.Sum())
 
-    local scan = self:createObject("GainBias","scan")
-    local scanRange = self:createObject("MinMax","scanRange")
-    local modVca = self:createObject("Multiply","modVca")
-    local modLevel = self:createObject("GainBias","modLevel")
-    local modLevelRange = self:createObject("MinMax","modLevelRange")
+    local scan = self:addObject("scan",app.GainBias())
+    local scanRange = self:addObject("scanRange",app.MinMax())
+    local modVca = self:addObject("modVca",app.Multiply())
+    local modLevel = self:addObject("modLevel",app.GainBias())
+    local modLevelRange = self:addObject("modLevelRange",app.MinMax())
 
     connect(f0,"Out",mod,"Fundamental")
     connect(f0,"Out",f0Range,"In")
@@ -132,14 +133,14 @@ function Phaser4:loadMonoGraph()
     connect(modLevel,"Out",modLevelRange,"In")
 
     for i = 1,4 do 
-        localDSP["delay" .. i] = self:createObject("Delay","delay" .. i,2)
+        localDSP["delay" .. i] = self:addObject("delay" .. i,libcore.Delay(2))
         localDSP["delay" .. i]:allocateTimeUpTo(0.05)
-        localDSP["feedBackMix" .. i] = self:createObject("Sum","feedBackMix" .. i)
-        localDSP["feedBackGain" .. i] = self:createObject("ConstantGain","feedBackGain" .. i)
-        localDSP["feedForwardMix" .. i] = self:createObject("Sum","feedForwardMix" .. i)
-        localDSP["feedForwardGain" .. i] = self:createObject("ConstantGain","feedForwardGain" .. i)
-        localDSP["limiter" .. i] = self:createObject("Limiter","limiter" .. i)
-        localDSP["modGainBias" .. i] = self:createObject("ParameterAdapter","modGainBias" ..i)  
+        localDSP["feedBackMix" .. i] = self:addObject("feedBackMix" .. i,app.Sum())
+        localDSP["feedBackGain" .. i] = self:addObject("feedBackGain" .. i,app.ConstantGain())
+        localDSP["feedForwardMix" .. i] = self:addObject("feedForwardMix" .. i,app.Sum())
+        localDSP["feedForwardGain" .. i] = self:addObject("feedForwardGain" .. i,app.ConstantGain())
+        localDSP["limiter" .. i] = self:addObject("limiter" .. i,libcore.Limiter())
+        localDSP["modGainBias" .. i] = self:addObject("modGainBias" ..i,app.ParameterAdapter()) 
         localDSP["modGainBias" .. i]:hardSet("Bias", (i*.001) + .001)
         localDSP["modGainBias" .. i]:hardSet("Gain", .002)
 
@@ -175,11 +176,11 @@ function Phaser4:loadMonoGraph()
     connect(localDSP["feedForwardMix4"],"Out",wetVCA,"Right")
     connect(outSum,"Out",self,"Out1")
 
-    self:createMonoBranch("gain",gainAdapter,"In",gainAdapter,"Out")
-    self:createMonoBranch("f0",f0,"In",f0,"Out")
-    self:createMonoBranch("wet",wetLevel,"In",wetLevel,"Out")
-    self:createMonoBranch("scan",scan,"In",scan,"Out")
-    self:createMonoBranch("modLevel",modLevel,"In",modLevel,"Out")
+    self:addMonoBranch("gain",gainAdapter,"In",gainAdapter,"Out")
+    self:addMonoBranch("f0",f0,"In",f0,"Out")
+    self:addMonoBranch("wet",wetLevel,"In",wetLevel,"Out")
+    self:addMonoBranch("scan",scan,"In",scan,"Out")
+    self:addMonoBranch("modLevel",modLevel,"In",modLevel,"Out")
 end
 
 local views = {

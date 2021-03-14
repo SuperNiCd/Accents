@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 -- local ModeSelect = require "Unit.MenuControl.OptionControl"
@@ -30,55 +30,60 @@ function VoltageBank:onLoadGraph(channelCount)
   local numSlots = 8
 
   -- define the different objects to be mass created
-  local objectList = {
-    sh = { "TrackAndHold" },
-    shOut = { "Multiply" },
-    shTrack = { "Multiply" },
-    shMix = { "Sum" },
-    bump  = { "BumpMap" },
-  }
+  -- local objectList = {
+  --   sh = { "TrackAndHold" },
+  --   shOut = { "Multiply" },
+  --   shTrack = { "Multiply" },
+  --   shMix = { "Sum" },
+  --   bump  = { "BumpMap" },
+  -- }
 
-  for k, v in pairs(objectList) do
+  -- for k, v in pairs(objectList) do
     for i = 1, numSlots do
-      local dynamicVar = k .. i
-      local dynamicDSPUnit = v[1]
-      localVars[dynamicVar] = self:createObject(dynamicDSPUnit,dynamicVar)
+      -- local dynamicVar = k .. i
+      -- local dynamicDSPUnit = v[1]
+      -- localVars[dynamicVar] = self:addObject(dynamicDSPUnit,dynamicVar)
+      localVars["sh" .. i] = self:addObject("sh" ..i,libcore.TrackAndHold())
+      localVars["shOut" .. i] = self:addObject("shOut" ..i,app.Multiply())
+      localVars["shTrack" .. i] = self:addObject("shTrack" ..i,app.Multiply())
+      localVars["shMix" .. i] = self:addObject("shMix" ..i,app.Sum())
+      localVars["bump" .. i] = self:addObject("bump" ..i,libcore.BumpMap())
     end
-  end
+  -- end
 
-  local index = self:createObject("GainBias","index")
+  local index = self:addObject("index",app.GainBias())
   index:hardSet("Gain",1.0)
-  local indexRange = self:createObject("MinMax","indexRange")
-  local trig = self:createObject("Comparator","trig")
-  local divIndex = self:createObject("ConstantGain","divIndex")
+  local indexRange = self:addObject("indexRange",app.MinMax())
+  local trig = self:addObject("trig",app.Comparator())
+  local divIndex = self:addObject("divIndex",app.ConstantGain())
 
-  local bypass = self:createObject("Comparator","bypass")
-  local invertingVCA = self:createObject("Multiply","invertingVCA")
-  local negOne = self:createObject("ConstantOffset","negOne")
-  local one = self:createObject("ConstantOffset","one")
-  local bypassSum = self:createObject("Sum","bypassSum")
+  local bypass = self:addObject("bypass",app.Comparator())
+  local invertingVCA = self:addObject("invertingVCA",app.Multiply())
+  local negOne = self:addObject("negOne",app.ConstantOffset())
+  local one = self:addObject("one",app.ConstantOffset())
+  local bypassSum = self:addObject("bypassSum",app.Sum())
   bypass:setToggleMode()
   negOne:hardSet("Offset",-1.0)
   one:hardSet("Offset",1.0)
 
   divIndex:hardSet("Gain",1/numSlots)
-  self:createMonoBranch("trig",trig,"In",trig,"Out")
-  self:createMonoBranch("index",index,"In",index,"Out")
-  self:createMonoBranch("bypass",bypass,"In",bypass,"Out")
+  self:addMonoBranch("trig",trig,"In",trig,"Out")
+  self:addMonoBranch("index",index,"In",index,"Out")
+  self:addMonoBranch("bypass",bypass,"In",bypass,"Out")
 
   local bumpMapWidth = 1 / numSlots
   local bumpMapOffset = bumpMapWidth / 2
 
-  local bumpOffset = self:createObject("ConstantOffset","bumpOffset")
+  local bumpOffset = self:addObject("bumpOffset",app.ConstantOffset())
   bumpOffset:hardSet("Offset",-bumpMapOffset)
 
-  local inToOutVCA = self:createObject("Multiply","inToOutVCA")
-  local inToOutVCAConst = self:createObject("Constant","inToOutVCAConst")
+  local inToOutVCA = self:addObject("inToOutVCA",app.Multiply())
+  local inToOutVCAConst = self:addObject("inToOutVCAConst",app.Constant())
   inToOutVCAConst:hardSet("Value",0.0)
-  local indexToOutVCA = self:createObject("Multiply","indexToOutVCA")
-  local indexToOutVCAConst = self:createObject("Constant","indexToOutVCAConst")
+  local indexToOutVCA = self:addObject("indexToOutVCA",app.Multiply())
+  local indexToOutVCAConst = self:addObject("indexToOutVCAConst",app.Constant())
   indexToOutVCAConst:hardSet("Value",1.0)
-  local outputMixer = self:createObject("Sum","outputMixer")
+  local outputMixer = self:addObject("outputMixer",app.Sum())
 
   -- set bump map properties
   for i = 1, numSlots do

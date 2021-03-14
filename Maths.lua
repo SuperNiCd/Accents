@@ -1,4 +1,3 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
 local Class = require "Base.Class"
 local Unit = require "Unit"
@@ -22,57 +21,57 @@ function Maths:init(args)
 end
 
 function Maths:onLoadGraph()
-  local a = self:createObject("ConstantGain","a")
-  local b = self:createObject("ConstantGain","b")
-  local sum = self:createObject("Sum","sum")
+  local a = self:addObject("a",app.ConstantGain())
+  local b = self:addObject("b",app.ConstantGain())
+  local sum = self:addObject("sum",app.Sum())
   a:hardSet("Gain",1.0)
   b:hardSet("Gain",1.0)
   a:setClampInDecibels(-59.9)
   b:setClampInDecibels(-59.9)
-  self:createMonoBranch("inA", a, "In", a,"Out")
-  self:createMonoBranch("inB", b, "In", b,"Out")
+  self:addMonoBranch("inA", a, "In", a,"Out")
+  self:addMonoBranch("inB", b, "In", b,"Out")
 
-  local negOne = self:createObject("Constant","negOne")
+  local negOne = self:addObject("negOne",app.Constant())
   negOne:hardSet("Value",-1.0)
-  local one = self:createObject("Constant","one")
+  local one = self:addObject("one",app.Constant())
   one:hardSet("Value",1.0)
 
-  local invert1 = self:createObject("Multiply","invert1")
-  local invert2 = self:createObject("Multiply","invert2")
-  local invert2C = self:createObject("Constant","invert2C")
+  local invert1 = self:addObject("invert1",app.Multiply())
+  local invert2 = self:addObject("invert2",app.Multiply())
+  local invert2C = self:addObject("invert2C",app.Constant())
   invert2C:hardSet("Value",-1.0)
-  local invert3 = self:createObject("Multiply","invert3")
-  local invert3C = self:createObject("Constant","invert3C")
+  local invert3 = self:addObject("invert3",app.Multiply())
+  local invert3C = self:addObject("invert3C",app.Constant())
   invert3C:hardSet("Value",1.0)
 
-  local compare = self:createObject("Comparator","compare")
+  local compare = self:addObject("compare",app.Comparator())
   compare:setGateMode()
   compare:hardSet("Hysteresis",0.0)
   compare:hardSet("Threshold",0.0)
 
-  local vcaA = self:createObject("Multiply","vcaA")
-  local vcaB = self:createObject("Multiply","vcaB")
-  local selectSum1 = self:createObject("Sum","selectSum1")
-  local selectSum1V = self:createObject("Constant","selectSum1V")
-  local selectSum2 = self:createObject("Sum","selectSum2")
-  local selectSum2V = self:createObject("Constant","selectSum2V")
+  local vcaA = self:addObject("vcaA",app.Multiply())
+  local vcaB = self:addObject("vcaB",app.Multiply())
+  local selectSum1 = self:addObject("selectSum1",app.Sum())
+  local selectSum1V = self:addObject("selectSum1V",app.Constant())
+  local selectSum2 = self:addObject("selectSum2",app.Sum())
+  local selectSum2V = self:addObject("selectSum2V",app.Constant())
   selectSum1V:hardSet("Value",0.0)
   selectSum2V:hardSet("Value",1.0)
 
-  local minmaxMix = self:createObject("Sum","minmaxMix")
+  local minmaxMix = self:addObject("minmaxMix",app.Sum())
 
-  local meanSum = self:createObject("Sum","meanSum")
-  local meanVCA = self:createObject("Multiply","meanVCA")
-  local meanVCAC = self:createObject("Constant","meanVCAC")
+  local meanSum = self:addObject("meanSum",app.Sum())
+  local meanVCA = self:addObject("meanVCA",app.Multiply())
+  local meanVCAC = self:addObject("meanVCAC",app.Constant())
   meanVCAC:hardSet("Value",0.5)
 
-  local selectMinMax = self:createObject("Multiply","selectMinMax")
-  local selectMean = self:createObject("Multiply","selectMean")
-  local selectMinMaxC = self:createObject("Constant","selectMinMaxC")
-  local selectMeanC = self:createObject("Constant","selectMeanC")
+  local selectMinMax = self:addObject("selectMinMax",app.Multiply())
+  local selectMean = self:addObject("selectMean",app.Multiply())
+  local selectMinMaxC = self:addObject("selectMinMaxC",app.Constant())
+  local selectMeanC = self:addObject("selectMeanC",app.Constant())
   selectMinMaxC:hardSet("Value",1.0)
   selectMeanC:hardSet("Value",0.0)
-  local finalMix = self:createObject("Sum","finalMix")
+  local finalMix = self:addObject("finalMix",app.Sum())
 
   -- mix/max
   connect(a,"Out",sum,"Left")
@@ -174,7 +173,7 @@ function Maths:setOp(op)
   end
 end
 
-function Maths:onLoadMenu(objects,branches)
+function Maths:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {

@@ -1,5 +1,6 @@
 -- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Pitch = require "Unit.ViewControl.Pitch"
@@ -28,22 +29,22 @@ end
 
 function AliasingPulse:loadMonoGraph()
   -- create objects
-  local osc = self:createObject("SineOscillator","osc")
-  local tune = self:createObject("ConstantOffset","tune")
-  local tuneRange = self:createObject("MinMax","tuneRange")
-  local f0 = self:createObject("GainBias","f0")
-  local f0Range = self:createObject("MinMax","f0Range")
-  local vca = self:createObject("Multiply","vca")
-  local level = self:createObject("GainBias","level")
-  local levelRange = self:createObject("MinMax","levelRange")
-  local bump = self:createObject("BumpMap","bump")
-  local width = self:createObject("ParameterAdapter","width")
-  local oscVca = self:createObject("Multiply","oscVca")
-  local oscVcaMult = self:createObject("Constant","oscVcaMult")
-  local compVca = self:createObject("Multiply","compVca")
-  local compVcaMult = self:createObject("Constant","compVcaMult")
-  local offset = self:createObject("ConstantOffset","offset")
-  local sync = self:createObject("Comparator","sync")
+  local osc = self:addObject("osc",libcore.SineOscillator())
+  local tune = self:addObject("tune",app.ConstantOffset())
+  local tuneRange = self:addObject("tuneRange",app.MinMax())
+  local f0 = self:addObject("f0",app.GainBias())
+  local f0Range = self:addObject("f0Range",app.MinMax())
+  local vca = self:addObject("vca",app.Multiply())
+  local level = self:addObject("level",app.GainBias())
+  local levelRange = self:addObject("levelRange",app.MinMax())
+  local bump = self:addObject("bump",libcore.BumpMap())
+  local width = self:addObject("width",app.ParameterAdapter())
+  local oscVca = self:addObject("oscVca",app.Multiply())
+  local oscVcaMult = self:addObject("oscVcaMult",app.Constant())
+  local compVca = self:addObject("compVca",app.Multiply())
+  local compVcaMult = self:addObject("compVcaMult",app.Constant())
+  local offset = self:addObject("offset",app.ConstantOffset())
+  local sync = self:addObject("sync",app.Comparator())
   sync:setTriggerMode()
 
   tie(bump,"Width",width,"Out")
@@ -73,11 +74,11 @@ function AliasingPulse:loadMonoGraph()
   connect(compVca,"Out",vca,"Right")
   connect(vca,"Out",self,"Out1")
 
-  self:createMonoBranch("level",level,"In",level,"Out")
-  self:createMonoBranch("tune",tune,"In",tune,"Out")
-  self:createMonoBranch("f0",f0,"In",f0,"Out")
-  self:createMonoBranch("width",width,"In",width,"Out")
-  self:createMonoBranch("sync",sync,"In",sync,"Out")
+  self:addMonoBranch("level",level,"In",level,"Out")
+  self:addMonoBranch("tune",tune,"In",tune,"Out")
+  self:addMonoBranch("f0",f0,"In",f0,"Out")
+  self:addMonoBranch("width",width,"In",width,"Out")
+  self:addMonoBranch("sync",sync,"In",sync,"Out")
 
 end
 

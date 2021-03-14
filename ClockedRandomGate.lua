@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local GainBias = require "Unit.ViewControl.GainBias"
@@ -21,33 +21,33 @@ function ClockedRandomGate:init(args)
 end
 
 function ClockedRandomGate:onLoadGraph(channelCount)
-  local tap = self:createObject("TapTempo","tap")
+  local tap = self:addObject("tap",libcore.TapTempo())
   tap:setBaseTempo(120)
-  local clock = self:createObject("ClockInSeconds","clock")
-  local tapEdge = self:createObject("Comparator","tapEdge")
-  local syncEdge = self:createObject("Comparator","syncEdge")
-  local width = self:createObject("ParameterAdapter","width")
-  local multiplier = self:createObject("ParameterAdapter","multiplier")
-  local divider = self:createObject("ParameterAdapter","divider")
+  local clock = self:addObject("clock",libcore.ClockInSeconds())
+  local tapEdge = self:addObject("tapEdge",app.Comparator())
+  local syncEdge = self:addObject("syncEdge",app.Comparator())
+  local width = self:addObject("width",app.ParameterAdapter())
+  local multiplier = self:addObject("multiplier",app.ParameterAdapter())
+  local divider = self:addObject("divider",app.ParameterAdapter())
 
-  local random = self:createObject("WhiteNoise","random")
-  local rectify = self:createObject("Rectify","rectify")
-  local compare = self:createObject("Comparator","compare")
-  local prob = self:createObject("ConstantOffset","prob")
-  local probOffset = self:createObject("ParameterAdapter","probOffset")
-  local thresh = self:createObject("ParameterAdapter","thresh")
-  local one = self:createObject("Constant","one")
-  local negOne = self:createObject("Constant","negOne")
-  local sum = self:createObject("Sum","sum")
-  local invert = self:createObject("Multiply","invert")
-  local sh = self:createObject("TrackAndHold","sh")
-  local shEdge = self:createObject("Comparator","shEdge")
-  local vca = self:createObject("Multiply","vca")
+  local random = self:addObject("random",libcore.WhiteNoise())
+  local rectify = self:addObject("rectify",libcore.Rectify())
+  local compare = self:addObject("compare",app.Comparator())
+  local prob = self:addObject("prob",app.ConstantOffset())
+  local probOffset = self:addObject("probOffset",app.ParameterAdapter())
+  local thresh = self:addObject("thresh",app.ParameterAdapter())
+  local one = self:addObject("one",app.Constant())
+  local negOne = self:addObject("negOne",app.Constant())
+  local sum = self:addObject("sum",app.Sum())
+  local invert = self:addObject("invert",app.Multiply())
+  local sh = self:addObject("sh",libcore.TrackAndHold())
+  local shEdge = self:addObject("shEdge",app.Comparator())
+  local vca = self:addObject("vca",app.Multiply())
 
   -- set parameters
   compare:hardSet("Hysteresis",0.0)
   compare:setGateMode()
-  rectify:optionSet("Type",3) --full rectification
+  rectify:setOptionValue("Type",3) --full rectification
   one:hardSet("Value",1.0)
   negOne:hardSet("Value",-1.0)
   shEdge:setTriggerMode()
@@ -62,11 +62,11 @@ function ClockedRandomGate:onLoadGraph(channelCount)
   tie(compare,"Threshold",thresh,"Out")
 
   -- register exported ports
-  self:createMonoBranch("sync",syncEdge,"In",syncEdge,"Out")
-  self:createMonoBranch("width",width,"In",width,"Out")
-  self:createMonoBranch("multiplier",multiplier,"In",multiplier,"Out")
-  self:createMonoBranch("divider",divider,"In",divider,"Out")
-  self:createMonoBranch("prob",probOffset,"In",probOffset,"Out")
+  self:addMonoBranch("sync",syncEdge,"In",syncEdge,"Out")
+  self:addMonoBranch("width",width,"In",width,"Out")
+  self:addMonoBranch("multiplier",multiplier,"In",multiplier,"Out")
+  self:addMonoBranch("divider",divider,"In",divider,"Out")
+  self:addMonoBranch("prob",probOffset,"In",probOffset,"Out")
 
   -- connect objects
   connect(self,"In1",tapEdge,"In")
@@ -112,7 +112,7 @@ end
 
 local menu = {"infoHeader","rename","load","save","edit","rational"}
 
-function ClockedRandomGate:onLoadMenu(objects,branches)
+function ClockedRandomGate:onShowMenu(objects,branches)
   local controls = {}
 
   controls.rational = ModeSelect {

@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Fader = require "Unit.ViewControl.Fader"
@@ -19,19 +19,19 @@ end
 
 function RotarySim:onLoadGraph()
 
-    local half = self:createObject("ConstantOffset","half")
+    local half = self:addObject("half",app.ConstantOffset())
     half:hardSet("Offset",0.5)
-    local one = self:createObject("ConstantOffset","one")
+    local one = self:addObject("one",app.ConstantOffset())
     one:hardSet("Offset",1.0)
-    local smallGain = self:createObject("ConstantOffset","smallGain")
+    local smallGain = self:addObject("smallGain",app.ConstantOffset())
     smallGain:hardSet("Offset",0.001)
 
-    local equalizerHi = self:createObject("Equalizer3","equalizerHi")
+    local equalizerHi = self:addObject("equalizerHi",libcore.Equalizer3())
     connect(one,"Out",equalizerHi,"High Gain")
     connect(half,"Out",equalizerHi,"Mid Gain")
     connect(self,"In1",equalizerHi,"In")
 
-    local equalizerLo = self:createObject("Equalizer3","equalizerLo")
+    local equalizerLo = self:addObject("equalizerLo",libcore.Equalizer3())
     connect(one,"Out",equalizerLo,"Low Gain")
     connect(half,"Out",equalizerLo,"Mid Gain")
     connect(self,"In2",equalizerLo,"In")
@@ -41,35 +41,35 @@ function RotarySim:onLoadGraph()
 
     self.objects.equalizer = self.objects.equalizerHi
 
-    local panHi = self:createObject("MonoPanner","panHi")
-    local panLo = self:createObject("MonoPanner","panLo")
-    local dHi = self:createObject("DopplerDelay","dHi",0.1)
-    local dLo = self:createObject("DopplerDelay","dLo",0.1)
+    local panHi = self:addObject("panHi",app.MonoPanner())
+    local panLo = self:addObject("panLo",app.MonoPanner())
+    local dHi = self:addObject("dHi",libcore.DopplerDelay(0.1))
+    local dLo = self:addObject("dLo",libcore.DopplerDelay(0.1))
 
-    local modHiPan = self:createObject("SineOscillator","modHiPan")
-    local modLoPan = self:createObject("SineOscillator","modLoPan")
-    local modHiDly = self:createObject("SineOscillator","modHiDly")
-    local modLoDly = self:createObject("SineOscillator","modLoDly")
+    local modHiPan = self:addObject("modHiPan",libcore.SineOscillator())
+    local modLoPan = self:addObject("modLoPan",libcore.SineOscillator())
+    local modHiDly = self:addObject("modHiDly",libcore.SineOscillator())
+    local modLoDly = self:addObject("modLoDly",libcore.SineOscillator())
 
-    local lMix = self:createObject("Sum","lMix")
-    local rMix = self:createObject("Sum","rMix")
+    local lMix = self:addObject("lMix",app.Sum())
+    local rMix = self:addObject("rMix",app.Sum())
 
     connect(equalizerHi,"Out",dHi,"In")
     connect(dHi,"Out",panHi,"In")
     connect(equalizerLo,"Out",dLo,"In")
     connect(dLo,"Out",panLo,"In")
 
-    local modHiLvl = self:createObject("GainBias","modHiLvl")
-    local modHiLvlRange = self:createObject("MinMax","modHiLvlRange")
-    local modLoLvl = self:createObject("GainBias","modLoLvl")
-    local modLoLvlRange = self:createObject("MinMax","modLoLvlRange")
+    local modHiLvl = self:addObject("modHiLvl",app.GainBias())
+    local modHiLvlRange = self:addObject("modHiLvlRange",app.MinMax())
+    local modLoLvl = self:addObject("modLoLvl",app.GainBias())
+    local modLoLvlRange = self:addObject("modLoLvlRange",app.MinMax())
 
-    local modLoDlyVCA = self:createObject("Multiply","modLoDlyVCA")
-    local modHiDlyVCA = self:createObject("Multiply","modHiDlyVCA")
-    local dHiVCA = self:createObject("Multiply","dHiVCA")
-    local dLoVCA = self:createObject("Multiply","dLoVCA")
-    local dHiMix = self:createObject("Sum","dHiMix")
-    local dLoMix = self:createObject("Sum","dLoMix")
+    local modLoDlyVCA = self:addObject("modLoDlyVCA",app.Multiply())
+    local modHiDlyVCA = self:addObject("modHiDlyVCA",app.Multiply())
+    local dHiVCA = self:addObject("dHiVCA",app.Multiply())
+    local dLoVCA = self:addObject("dLoVCA",app.Multiply())
+    local dHiMix = self:addObject("dHiMix",app.Sum())
+    local dLoMix = self:addObject("dLoMix",app.Sum())
     
 
     connect(modHiLvl,"Out",modHiLvlRange,"In")
@@ -92,8 +92,8 @@ function RotarySim:onLoadGraph()
     connect(dHiMix,"Out",dHi,"Delay")
     connect(dLoMix,"Out",dLo,"Delay")
 
-    local modHiFreqVCA = self:createObject("Multiply","modHiFreqVCA")
-    local modLoFreqVCA = self:createObject("Multiply","modLoFreqVCA")
+    local modHiFreqVCA = self:addObject("modHiFreqVCA",app.Multiply())
+    local modLoFreqVCA = self:addObject("modLoFreqVCA",app.Multiply())
 
     connect(modHiLvl,"Out",modHiFreqVCA,"Left")
     connect(modLoLvl,"Out",modLoFreqVCA,"Left")
@@ -102,8 +102,8 @@ function RotarySim:onLoadGraph()
     connect(modHiFreqVCA,"Out",modHiDly,"Fundamental")
     connect(modLoFreqVCA,"Out",modLoDly,"Fundamental")
 
-    self:createMonoBranch("modHiLvl",modHiLvl,"In",modHiLvl,"Out")
-    self:createMonoBranch("modLoLvl",modLoLvl,"In",modLoLvl,"Out")
+    self:addMonoBranch("modHiLvl",modHiLvl,"In",modHiLvl,"Out")
+    self:addMonoBranch("modLoLvl",modLoLvl,"In",modLoLvl,"Out")
 
     connect(panHi,"Left",lMix,"Left")
     connect(panLo,"Left",lMix,"Right")

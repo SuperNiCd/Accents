@@ -1,5 +1,6 @@
 -- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Fader = require "Unit.ViewControl.Fader"
@@ -18,8 +19,8 @@ function BespokeBPF:init(args)
 end
 
 function BespokeBPF:onLoadGraph(channelCount)
-  local lpfilter = self:createObject("StereoLadderFilter","filter")
-  local hpfilter = self:createObject("StereoLadderHPF","filter")
+  local lpfilter = self:addObject("filter",libcore.StereoLadderFilter())
+  local hpfilter = self:addObject("filter",libcore.StereoLadderHPF())
   if channelCount==2 then
     connect(self,"In1",lpfilter,"Left In")
     connect(lpfilter,"Left Out",hpfilter,"Left In")
@@ -33,27 +34,27 @@ function BespokeBPF:onLoadGraph(channelCount)
     connect(hpfilter,"Left Out",self,"Out1")
   end
 
-  local tune = self:createObject("ConstantOffset","tune")
-  local tuneRange = self:createObject("MinMax","tuneRange")
+  local tune = self:addObject("tune",app.ConstantOffset())
+  local tuneRange = self:addObject("tuneRange",app.MinMax())
 
-  local f0 = self:createObject("GainBias","f0")
-  local f0Range = self:createObject("MinMax","f0Range")
+  local f0 = self:addObject("f0",app.GainBias())
+  local f0Range = self:addObject("f0Range",app.MinMax())
 
-  local res = self:createObject("GainBias","res")
-  local resRange = self:createObject("MinMax","resRange")
+  local res = self:addObject("res",app.GainBias())
+  local resRange = self:addObject("resRange",app.MinMax())
 
-  local clipper = self:createObject("Clipper","clipper")
+  local clipper = self:addObject("clipper",libcore.Clipper())
   clipper:setMaximum(0.999)
   clipper:setMinimum(0)
 
-  local bw = self:createObject("GainBias","bw")
-  local bwRange = self:createObject("MinMax","bwRange")
+  local bw = self:addObject("bw",app.GainBias())
+  local bwRange = self:addObject("bwRange",app.MinMax())
 
-  local negate = self:createObject("ConstantGain","negate")
+  local negate = self:addObject("negate",app.ConstantGain())
   negate:hardSet("Gain",-1)
 
-  local addBw = self:createObject("Sum","addBw")
-  local subBw = self:createObject("Sum","subBw")
+  local addBw = self:addObject("addBw",app.Sum())
+  local subBw = self:addObject("subBw",app.Sum())
 
   connect(tune,"Out",lpfilter,"V/Oct")
   connect(tune,"Out",hpfilter,"V/Oct")
@@ -79,10 +80,10 @@ function BespokeBPF:onLoadGraph(channelCount)
   connect(clipper,"Out",hpfilter,"Resonance")
   connect(clipper,"Out",resRange,"In")
 
-  self:createMonoBranch("tune",tune,"In",tune,"Out")
-  self:createMonoBranch("Q",res,"In",res,"Out")
-  self:createMonoBranch("f0",f0,"In",f0,"Out")
-  self:createMonoBranch("bw",bw,"In",bw,"Out")
+  self:addMonoBranch("tune",tune,"In",tune,"Out")
+  self:addMonoBranch("Q",res,"In",res,"Out")
+  self:addMonoBranch("f0",f0,"In",f0,"Out")
+  self:addMonoBranch("bw",bw,"In",bw,"Out")
 end
 
 local views = {

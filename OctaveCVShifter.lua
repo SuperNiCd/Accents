@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local GainBias = require "Unit.ViewControl.GainBias"
@@ -18,18 +18,18 @@ end
 
 function OctaveCVShifter:onLoadGraph(channelCount)
   --create objects
-  local offset = self:createObject("ConstantOffset","offset")
-  local offsetAdapter = self:createObject("ParameterAdapter","offsetAdapter")
-  local fixedGain = self:createObject("Constant","fixedGain")
-  local gain = self:createObject("Multiply","gain")
-  local mix = self:createObject("Sum","mix")
-  local quant = self:createObject("GridQuantizer","quant")
+  local offset = self:addObject("offset",app.ConstantOffset())
+  local offsetAdapter = self:addObject("offsetAdapter",app.ParameterAdapter())
+  local fixedGain = self:addObject("fixedGain",app.Constant())
+  local gain = self:addObject("gain",app.Multiply())
+  local mix = self:addObject("mix",app.Sum())
+  local quant = self:addObject("quant",libcore.GridQuantizer())
 
   fixedGain:hardSet("Value",0.1)
   quant:hardSet("Levels",10)
 
   -- register exported ports
-  self:createMonoBranch("octave",offsetAdapter,"In",offsetAdapter,"Out")
+  self:addMonoBranch("octave",offsetAdapter,"In",offsetAdapter,"Out")
 
   -- connect objects
   connect(self,"In1",mix,"Left")

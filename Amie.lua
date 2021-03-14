@@ -1,5 +1,6 @@
 -- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Pitch = require "Unit.ViewControl.Pitch"
@@ -21,42 +22,42 @@ end
 function Amie:onLoadGraph(channelCount)
 
     --carrier
-    local carrier = self:createObject("SineOscillator","carrier")
-    local ctune = self:createObject("ConstantOffset","ctune")
-    local ctuneRange = self:createObject("MinMax","ctuneRange")
-    local cf0 = self:createObject("GainBias","cf0")
-    local cf0Range = self:createObject("MinMax","cf0Range")
-    local climgain = self:createObject("ConstantGain","climgain")
-    local climiter = self:createObject("Limiter","climiter")
-    local cfdbk = self:createObject("GainBias","cfdbk")
-    local cfdbkRange = self:createObject("MinMax","cfdbkRange")
+    local carrier = self:addObject("carrier",libcore.SineOscillator())
+    local ctune = self:addObject("ctune",app.ConstantOffset())
+    local ctuneRange = self:addObject("ctuneRange",app.MinMax())
+    local cf0 = self:addObject("cf0",app.GainBias())
+    local cf0Range = self:addObject("cf0Range",app.MinMax())
+    local climgain = self:addObject("climgain",app.ConstantGain())
+    local climiter = self:addObject("climiter",libcore.Limiter())
+    local cfdbk = self:addObject("cfdbk",app.GainBias())
+    local cfdbkRange = self:addObject("cfdbkRange",app.MinMax())
     connect(cfdbk,"Out",cfdbkRange,"In")
 
     -- modulator
-    local modulator = self:createObject("SineOscillator","modulator")
-    local mRatio = self:createObject("GainBias","mRatio")
-    local mRatioRange = self:createObject("MinMax","mRatioRange")
-    local mRatioVCA = self:createObject("Multiply","mRatioVCA")
-    local mlimgain = self:createObject("GainBias","mlimgain")
-    local mlimiter = self:createObject("Limiter","mlimiter")
-    local mfdbk = self:createObject("GainBias","mfdbk")
-    local mfdbkRange = self:createObject("MinMax","mfdbkRange")
+    local modulator = self:addObject("modulator",libcore.SineOscillator())
+    local mRatio = self:addObject("mRatio",app.GainBias())
+    local mRatioRange = self:addObject("mRatioRange",app.MinMax())
+    local mRatioVCA = self:addObject("mRatioVCA",app.Multiply())
+    local mlimgain = self:addObject("mlimgain",app.GainBias())
+    local mlimiter = self:addObject("mlimiter",libcore.Limiter())
+    local mfdbk = self:addObject("mfdbk",app.GainBias())
+    local mfdbkRange = self:addObject("mfdbkRange",app.MinMax())
     connect(mfdbk,"Out",mfdbkRange,"In")
 
     -- AM VCA
-    local amvca = self:createObject("Multiply","amvca")
-    local amIndex = self:createObject("GainBias","amIndex")
-    local amIndexRange = self:createObject("MinMax","amIndexRange")
+    local amvca = self:addObject("amvca",app.Multiply())
+    local amIndex = self:addObject("amIndex",app.GainBias())
+    local amIndexRange = self:addObject("amIndexRange",app.MinMax())
 
     -- wet/dry mixer
-    local mixer = self:createObject("CrossFade","mixer")
-    local wet = self:createObject("GainBias","wet")
-    local wetRange = self:createObject("MinMax","wetRange")
+    local mixer = self:addObject("mixer",app.CrossFade())
+    local wet = self:addObject("wet",app.GainBias())
+    local wetRange = self:addObject("wetRange",app.MinMax())
 
     -- output volume control
-    local vca = self:createObject("Multiply","vca")
-    local level = self:createObject("GainBias","level")
-    local levelRange = self:createObject("MinMax","levelRange")
+    local vca = self:addObject("vca",app.Multiply())
+    local level = self:addObject("level",app.GainBias())
+    local levelRange = self:addObject("levelRange",app.MinMax())
 
     --tuning
     connect(ctune,"Out",ctuneRange,"In")
@@ -93,13 +94,13 @@ function Amie:onLoadGraph(channelCount)
         connect(vca,"Out",self,"Out2")
     end
 
-    self:createMonoBranch("level",level,"In",level,"Out")
-    self:createMonoBranch("tune",ctune,"In",ctune,"Out")
-    self:createMonoBranch("f0",cf0,"In",cf0,"Out")
-    self:createMonoBranch("ratio",mRatio,"In",mRatio,"Out")
-    self:createMonoBranch("wet",wet,"In",wet,"Out")
-    self:createMonoBranch("cfdbk",cfdbk,"In",cfdbk,"Out")
-    self:createMonoBranch("mfdbk",mfdbk,"In",mfdbk,"Out")
+    self:addMonoBranch("level",level,"In",level,"Out")
+    self:addMonoBranch("tune",ctune,"In",ctune,"Out")
+    self:addMonoBranch("f0",cf0,"In",cf0,"Out")
+    self:addMonoBranch("ratio",mRatio,"In",mRatio,"Out")
+    self:addMonoBranch("wet",wet,"In",wet,"Out")
+    self:addMonoBranch("cfdbk",cfdbk,"In",cfdbk,"Out")
+    self:addMonoBranch("mfdbk",mfdbk,"In",mfdbk,"Out")
 end
       
     local views = {

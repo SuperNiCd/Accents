@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Pitch = require "Unit.ViewControl.Pitch"
@@ -37,8 +37,8 @@ end
 function Xoxo:loadMonoGraph()
 
     local localDSP = {}
-    local libraryName = self.loadInfo.libraryName
-    local sampleFilename = Path.join("1:/ER-301/libs",libraryName,"assets/xoxo.wav")
+    local Accents = require "Accents"
+    local sampleFilename = Path.join(Accents:getInstallationPath(),"xoxo.wav")
     local sample = SamplePool.load(sampleFilename)
 
     if not sample then
@@ -46,15 +46,15 @@ function Xoxo:loadMonoGraph()
       Overlay.mainFlashMessage("Could not load %s.",sampleFilename)
     end
 
-    local tune = self:createObject("ConstantOffset","tune")
-    local tuneRange = self:createObject("MinMax","tuneRange")
-    local f0 = self:createObject("GainBias","f0")
-    local f0Range = self:createObject("MinMax","f0Range")
-    local vca = self:createObject("Multiply","vca")
-    local level = self:createObject("GainBias","level")
-    local levelRange = self:createObject("MinMax","levelRange")
-    local sync = self:createObject("Comparator","sync")
-    -- local clip = self:createObject("Comparator","clip")
+    local tune = self:addObject("tune",app.ConstantOffset())
+    local tuneRange = self:addObject("tuneRange",app.MinMax())
+    local f0 = self:addObject("f0",app.GainBias())
+    local f0Range = self:addObject("f0Range",app.MinMax())
+    local vca = self:addObject("vca",app.Multiply())
+    local level = self:addObject("level",app.GainBias())
+    local levelRange = self:addObject("levelRange",app.MinMax())
+    local sync = self:addObject("sync",app.Comparator())
+    -- local clip = self:addObject("Comparator","clip")
     -- sync:setTriggerMode()
     -- clip:setTriggerMode()
     -- clip:hardSet("Threshold",1.0)
@@ -65,23 +65,23 @@ function Xoxo:loadMonoGraph()
 
     local opNames = {"A","B","C","D"}
     for i, name in ipairs(opNames) do
-        localDSP["op" .. name] = self:createObject("SingleCycle","op" .. name)
+        localDSP["op" .. name] = self:addObject("op" .. name,libcore.SingleCycle())
         localDSP["op" .. name]:setSample(sample.pSample,sample.slices.pSlices)
-        localDSP["op" .. name .. "ratio"] = self:createObject("GainBias","op" .. name .. "ratio")
-        localDSP["op" .. name .. "ratioRange"] = self:createObject("MinMax","op" .. name .. "ratioRange")
-        localDSP["op" .. name .. "ratioX"] = self:createObject("Multiply","op" .. name .. "ratioX")
-        localDSP["op" .. name .. "outLevel"] = self:createObject("GainBias","op" .. name .. "outLevel")
-        localDSP["op" .. name .. "outLevelRange"] = self:createObject("MinMax","op" .. name .. "outLevelRange")
-        localDSP["op" .. name .. "outVCA"] = self:createObject("Multiply","op" .. name .. "outVCA")
-        localDSP["op" .. name .. "scan"] = self:createObject("GainBias","op" .. name .. "scan")
-        localDSP["op" .. name .. "scanRange"] = self:createObject("MinMax","op" .. name .. "scanRange")
-        localDSP["op" .. name .. "tune"] = self:createObject("GainBias","op" .. name .. "tune")
-        localDSP["op" .. name .. "tuneRange"] = self:createObject("MinMax","op" .. name .. "tuneRange")
-        localDSP["op" .. name .. "tuneSum"] = self:createObject("Sum","op" .. name .. "tuneSum")
-        localDSP["op" .. name .. "track"] = self:createObject("Comparator","op" .. name .. "track")
-        localDSP["op" .. name .. "trackX"] = self:createObject("Multiply","op" .. name .. "trackX")
+        localDSP["op" .. name .. "ratio"] = self:addObject("op" .. name .. "ratio",app.GainBias())
+        localDSP["op" .. name .. "ratioRange"] = self:addObject("op" .. name .. "ratioRange",app.MinMax())
+        localDSP["op" .. name .. "ratioX"] = self:addObject("op" .. name .. "ratioX",app.Multiply())
+        localDSP["op" .. name .. "outLevel"] = self:addObject("op" .. name .. "outLevel",app.GainBias())
+        localDSP["op" .. name .. "outLevelRange"] = self:addObject("op" .. name .. "outLevelRange",app.MinMax())
+        localDSP["op" .. name .. "outVCA"] = self:addObject("op" .. name .. "outVCA",app.Multiply())
+        localDSP["op" .. name .. "scan"] = self:addObject("op" .. name .. "scan",app.GainBias())
+        localDSP["op" .. name .. "scanRange"] = self:addObject("op" .. name .. "scanRange",app.MinMax())
+        localDSP["op" .. name .. "tune"] = self:addObject("op" .. name .. "tune",app.GainBias())
+        localDSP["op" .. name .. "tuneRange"] = self:addObject("op" .. name .. "tuneRange",app.MinMax())
+        localDSP["op" .. name .. "tuneSum"] = self:addObject("op" .. name .. "tuneSum",app.Sum())
+        localDSP["op" .. name .. "track"] = self:addObject("op" .. name .. "track",app.Comparator())
+        localDSP["op" .. name .. "trackX"] = self:addObject("op" .. name .. "trackX",app.Multiply())
         localDSP["op" .. name .. "track"]:setToggleMode()
-        localDSP["op" .. name .. "track"]:optionSet("State",1.0)
+        localDSP["op" .. name .. "track"]:setOptionValue("State",1.0)
         connect(localDSP["op" .. name .. "track"],"Out",localDSP["op" .. name .. "trackX"],"Left")
         connect(localDSP["op" .. name .. "scan"],"Out",localDSP["op" .. name .. "scanRange"],"In")
         connect(localDSP["op" .. name .. "scan"],"Out",localDSP["op" .. name],"Slice Select")
@@ -103,16 +103,16 @@ function Xoxo:loadMonoGraph()
 
      for i, name in ipairs(opNames) do
         for j, name2 in ipairs(opNames) do
-            localDSP["phase" .. name .. name2] = self:createObject("GainBias","phase" .. name .. name2)
-            localDSP["phaseRange" .. name .. name2] = self:createObject("MinMax","phaseRange" .. name .. name2)
+            localDSP["phase" .. name .. name2] = self:addObject("phase" .. name .. name2,app.GainBias())
+            localDSP["phaseRange" .. name .. name2] = self:addObject("phaseRange" .. name .. name2,app.MinMax())
             connect(localDSP["phase" .. name .. name2],"Out",localDSP["phaseRange" .. name .. name2],"In")
-            localDSP["phaseX" .. name .. name2] = self:createObject("Multiply","phaseX" .. name .. name2)
+            localDSP["phaseX" .. name .. name2] = self:addObject("phaseX" .. name .. name2,app.Multiply())
             connect(localDSP["phase" .. name .. name2],"Out",localDSP["phaseX" .. name .. name2],"Left")
             connect(localDSP["op" .. name],"Out",localDSP["phaseX" .. name .. name2],"Right")
-            self:createMonoBranch(name .. "to" .. name2,localDSP["phase" .. name .. name2],"In",localDSP["phase" .. name .. name2],"Out")
+            self:addMonoBranch(name .. "to" .. name2,localDSP["phase" .. name .. name2],"In",localDSP["phase" .. name .. name2],"Out")
         end
         for j = 1, 3 do
-            localDSP["phaseMixer" .. name .. j] = self:createObject("Sum","phaseMixer" .. name .. j)
+            localDSP["phaseMixer" .. name .. j] = self:addObject("phaseMixer" .. name .. j,app.Sum())
         end
     end
 
@@ -127,7 +127,7 @@ function Xoxo:loadMonoGraph()
     end 
 
     for i = 1, 3 do
-        localDSP["outputMixer" .. i] = self:createObject("Sum","outputMixer" .. i)
+        localDSP["outputMixer" .. i] = self:addObject("outputMixer" .. i,app.Sum())
     end
     connect(localDSP["opAoutVCA"],"Out",localDSP["outputMixer1"],"Left")
     connect(localDSP["opBoutVCA"],"Out",localDSP["outputMixer1"],"Right")
@@ -141,19 +141,19 @@ function Xoxo:loadMonoGraph()
     -- connect(localDSP["outputMixer5"],"Out",clip,"In")
     connect(vca,"Out",self,"Out1")
 
-    self:createMonoBranch("level",level,"In",level,"Out")
-    self:createMonoBranch("tune",tune,"In",tune,"Out")
-    self:createMonoBranch("sync",sync,"In",sync,"Out")
-    self:createMonoBranch("f0",f0,"In",f0,"Out")
-    -- self:createMonoBranch("clip",clip,"In",clip,"Out")
+    self:addMonoBranch("level",level,"In",level,"Out")
+    self:addMonoBranch("tune",tune,"In",tune,"Out")
+    self:addMonoBranch("sync",sync,"In",sync,"Out")
+    self:addMonoBranch("f0",f0,"In",f0,"Out")
+    -- self:addMonoBranch("clip",clip,"In",clip,"Out")
     
 
     for i, name in ipairs(opNames) do
-        self:createMonoBranch("ratio" .. name,localDSP["op" .. name .. "ratio"],"In",localDSP["op" .. name .. "ratio"],"Out")
-        self:createMonoBranch("outLevel" .. name,localDSP["op" .. name .. "outLevel"],"In",localDSP["op" .. name .. "outLevel"],"Out")
-        self:createMonoBranch("scan" .. name,localDSP["op" .. name .. "scan"],"In",localDSP["op" .. name .. "scan"],"Out")
-        self:createMonoBranch("tune" .. name,localDSP["op" .. name .. "tune"],"In",localDSP["op" .. name .. "tune"],"Out")
-        self:createMonoBranch("track" .. name,localDSP["op" .. name .. "track"],"In",localDSP["op" .. name .. "track"],"Out")
+        self:addMonoBranch("ratio" .. name,localDSP["op" .. name .. "ratio"],"In",localDSP["op" .. name .. "ratio"],"Out")
+        self:addMonoBranch("outLevel" .. name,localDSP["op" .. name .. "outLevel"],"In",localDSP["op" .. name .. "outLevel"],"Out")
+        self:addMonoBranch("scan" .. name,localDSP["op" .. name .. "scan"],"In",localDSP["op" .. name .. "scan"],"Out")
+        self:addMonoBranch("tune" .. name,localDSP["op" .. name .. "tune"],"In",localDSP["op" .. name .. "tune"],"Out")
+        self:addMonoBranch("track" .. name,localDSP["op" .. name .. "track"],"In",localDSP["op" .. name .. "track"],"Out")
     end
 
 
@@ -345,7 +345,7 @@ function Xoxo:changeView(view)
     self:switchView(view)
 end
   
-  function Xoxo:onLoadMenu(objects,branches)
+  function Xoxo:onShowMenu(objects,branches)
     local controls = {}
 
     controls.title = MenuHeader {

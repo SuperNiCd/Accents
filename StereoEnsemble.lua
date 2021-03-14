@@ -1,5 +1,5 @@
--- GLOBALS: app, os, verboseLevel, connect, tie
 local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Fader = require "Unit.ViewControl.Fader"
@@ -21,34 +21,34 @@ function StereoEnsemble:init(args)
 end
 
 function StereoEnsemble:onLoadGraph(channelCount)
-  local s2m = channelCount > 1 and self:createObject("StereoToMono","s2m") or nil
-  local lfo1 = self:createObject("SineOscillator","lfo1")
-  local lfo2 = self:createObject("SineOscillator","lfo2")
-  local lfo1f0 = self:createObject("ConstantOffset","lfo1f0")
-  local lfo2f0 = self:createObject("ConstantOffset","lfo2f0")
-  local lfo1f0Control = self:createObject("ParameterAdapter","lfo1f0Control")
-  local phase1 = self:createObject("MicroDelay","phase1",1)
-  local phase2 = self:createObject("MicroDelay","phase2",1)
-  local delay1 = self:createObject("Delay","delay1",1)
-  local delay2 = self:createObject("Delay","delay2",1)
-  local delay3 = self:createObject("Delay","delay3",1)
-  local delay1time = self:createObject("ConstantOffset","delay1time")
-  local delay2time = self:createObject("ConstantOffset","delay2time")
-  local delay3time = self:createObject("ConstantOffset","delay3time")
-  local delay1adapter = self:createObject("ParameterAdapter","delay1adapter")
-  local delay2adapter = self:createObject("ParameterAdapter","delay2adapter")
-  local delay3adapter = self:createObject("ParameterAdapter","delay3adapter")
-  local depthVCA = self:createObject("Multiply","depthVCA")
-  local depthVCAGain = self:createObject("Constant","depthVCAGain")
-  local mix1 = self:createObject("Sum","mix1")
-  local mix2 = self:createObject("Sum","mix2")
-  local mix3 = self:createObject("Sum","mix3")
-  local dryMix = self:createObject("Sum","dryMix")
-  local amtVCA = self:createObject("Multiply","amtVCA")
-  local amtVCALevel = self:createObject("ConstantOffset","amtVCALevel")
-  local amtVCALevelControl = self:createObject("ParameterAdapter","amtVCALevelControl")
-  local modVCA = self:createObject("Multiply","modVCA")
-  local modVCALevel = self:createObject("ConstantOffset","modVCALevel")
+  local s2m = channelCount > 1 and self:addObject("s2m",app.StereoToMono()) or nil
+  local lfo1 = self:addObject("lfo1",libcore.SineOscillator())
+  local lfo2 = self:addObject("lfo2",libcore.SineOscillator())
+  local lfo1f0 = self:addObject("lfo1f0",app.ConstantOffset())
+  local lfo2f0 = self:addObject("lfo2f0",app.ConstantOffset())
+  local lfo1f0Control = self:addObject("lfo1f0Control",app.ParameterAdapter())
+  local phase1 = self:addObject("phase1",libcore.MicroDelay(1))
+  local phase2 = self:addObject("phase2",libcore.MicroDelay(1))
+  local delay1 = self:addObject("delay1",libcore.Delay(1))
+  local delay2 = self:addObject("delay2",libcore.Delay(1))
+  local delay3 = self:addObject("delay3",libcore.Delay(1))
+  local delay1time = self:addObject("delay1time",app.ConstantOffset())
+  local delay2time = self:addObject("delay2time",app.ConstantOffset())
+  local delay3time = self:addObject("delay3time",app.ConstantOffset())
+  local delay1adapter = self:addObject("delay1adapter",app.ParameterAdapter())
+  local delay2adapter = self:addObject("delay2adapter",app.ParameterAdapter())
+  local delay3adapter = self:addObject("delay3adapter",app.ParameterAdapter())
+  local depthVCA = self:addObject("depthVCA",app.Multiply())
+  local depthVCAGain = self:addObject("depthVCAGain",app.Constant())
+  local mix1 = self:addObject("mix1",app.Sum())
+  local mix2 = self:addObject("mix2",app.Sum())
+  local mix3 = self:addObject("mix3",app.Sum())
+  local dryMix = self:addObject("dryMix",app.Sum())
+  local amtVCA = self:addObject("amtVCA",app.Multiply())
+  local amtVCALevel = self:addObject("amtVCALevel",app.ConstantOffset())
+  local amtVCALevelControl = self:addObject("amtVCALevelControl",app.ParameterAdapter())
+  local modVCA = self:addObject("modVCA",app.Multiply())
+  local modVCALevel = self:addObject("modVCALevel",app.ConstantOffset())
 
   lfo2f0:hardSet("Offset",1.0)
   phase1:hardSet("Delay",0.056)
@@ -71,8 +71,8 @@ function StereoEnsemble:onLoadGraph(channelCount)
   tie(delay2,"Left Delay",delay2adapter,"Out")
   tie(delay3,"Left Delay",delay3adapter,"Out")
 
-  self:createMonoBranch("amt",amtVCALevelControl,"In",amtVCALevelControl,"Out")
-  self:createMonoBranch("rate",lfo1f0Control,"In",lfo1f0Control,"Out")
+  self:addMonoBranch("amt",amtVCALevelControl,"In",amtVCALevelControl,"Out")
+  self:addMonoBranch("rate",lfo1f0Control,"In",lfo1f0Control,"Out")
 
   connect(lfo1f0,"Out",lfo1,"Fundamental")
   connect(lfo2f0,"Out",lfo2,"Fundamental")
@@ -130,7 +130,7 @@ local menu = {
   "edit"
 }
 
-function StereoEnsemble:onLoadMenu(objects,branches)
+function StereoEnsemble:onShowMenu(objects,branches)
   local controls = {}
 
   if objects.s2m then

@@ -1,4 +1,5 @@
--- GLOBALS: app, connect
+local app = app
+local libcore = require "core.libcore"
 local Class = require "Base.Class"
 local Unit = require "Unit"
 local Pitch = require "Unit.ViewControl.Pitch"
@@ -22,15 +23,15 @@ function Ringmod:onLoadGraph(channelCount)
   -- input, vca, sine osc
 
   -- create sine osc
-  local modulator = self:createObject("SineOscillator","modulator")
+  local modulator = self:addObject("modulator",libcore.SineOscillator())
 
   -- create multipliers
-  local mult1 = self:createObject("Multiply","mult1")
-  local mult2 = self:createObject("Multiply","mult2")
+  local mult1 = self:addObject("mult1",app.Multiply())
+  local mult2 = self:addObject("mult2",app.Multiply())
 
   -- create f0 gainbias & minmax
-  local f0 = self:createObject("GainBias","f0")
-  local f0Range = self:createObject("MinMax","f0Range")
+  local f0 = self:addObject("f0",app.GainBias())
+  local f0Range = self:addObject("f0Range",app.MinMax())
 
   -- connect unit input to vca/multipler
   connect(self,"In1",mult1,"Left")
@@ -53,7 +54,7 @@ function Ringmod:onLoadGraph(channelCount)
   connect(f0,"Out",modulator,"Fundamental")
   connect(f0,"Out",f0Range,"In")
 
-  self:createMonoBranch("f0",f0,"In",f0,"Out")
+  self:addMonoBranch("f0",f0,"In",f0,"Out")
 end
 
 local views = {
