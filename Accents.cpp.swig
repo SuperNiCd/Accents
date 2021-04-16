@@ -5,17 +5,17 @@
 
 #undef SWIGLUA
 
-#include </home/joe/Accents/VoltageVault.h>
-#include </home/joe/Accents/Maths.h>
-#include </home/joe/Accents/PointsEG.h>
-#include </home/joe/Accents/Bitwise.h>
+#include <./VoltageVault.h>
+#include <./Maths.h>
+#include <./PointsEG.h>
+#include <./Bitwise.h>
 
-	
+
 #define SWIGLUA
 
 %}
 
-%include </home/joe/Accents/VoltageVault.h>
-%include </home/joe/Accents/Maths.h>
-%include </home/joe/Accents/PointsEG.h>
-%include </home/joe/Accents/Bitwise.h>
+%include <./VoltageVault.h>
+%include <./Maths.h>
+%include <./PointsEG.h>
+%include <./Bitwise.h>
