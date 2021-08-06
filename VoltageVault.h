@@ -16,6 +16,7 @@ public:
     od::Outlet mOutput{"Out"};
     od::Parameter mIndex{"Index", 0};
     od::Inlet mBypass{"Bypass"};
+    od::Inlet mSumInput{"SumInput"};
 
 #endif
     void setVaults(int, float);

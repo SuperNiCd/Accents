@@ -12,17 +12,17 @@ local MenuHeader = require "Unit.MenuControl.Header"
 local Encoder = require "Encoder"
 local ply = app.SECTION_PLY
 
-local Maths = Class{}
-Maths:include(Unit)
+local Bitwise = Class{}
+Bitwise:include(Unit)
 
-function Maths:init(args)
-  args.title = "Maths"
-  args.mnemonic = "Ma"
+function Bitwise:init(args)
+  args.title = "Bitwise"
+  args.mnemonic = "BW"
   Unit.init(self,args)
 end
 
-function Maths:onLoadGraph()
-  local maths = self:addObject("maths",libAccents.Maths())
+function Bitwise:onLoadGraph()
+  local bitwise = self:addObject("bitwise",libAccents.Bitwise())
   local a = self:addObject("a",app.ConstantGain())
   local b = self:addObject("b",app.ConstantGain())
   a:hardSet("Gain",1.0)
@@ -32,9 +32,9 @@ function Maths:onLoadGraph()
   self:addMonoBranch("inA", a, "In", a,"Out")
   self:addMonoBranch("inB", b, "In", b,"Out")
 
-  connect(a,"Out",maths,"a")
-  connect(b,"Out",maths,"b")
-  connect(maths,"Out",self,"Out1")
+  connect(a,"Out",bitwise,"a")
+  connect(b,"Out",bitwise,"b")
+  connect(bitwise,"Out",self,"Out1")
 
 end
 
@@ -44,7 +44,7 @@ local views = {
   input = {}
 }
 
-function Maths:onLoadViews(objects,branches)
+function Bitwise:onLoadViews(objects,branches)
   local controls = {}
 
   controls.a = BranchMeter {
@@ -67,15 +67,14 @@ end
 
 local menu = {
   "setHeader",
-  "min",
-  "max",
-  "mean",
-  "div",
-  "inv",
-  "mod",
-  "tanh",
-  "atan",
-  "inlv",
+  "a",
+  "b",
+  "andop",
+  "orop",
+  "xorop",
+  "nandop",
+  "norop",
+  "xnorop",
 
   "infoHeader",
   "rename",
@@ -84,119 +83,109 @@ local menu = {
   "edit"
 }
 
-function Maths:setOp(op)
+function Bitwise:setOp(op)
   local objects = self.objects
   self.op = op
 
-  if op=="MIN" then
-    objects.maths:setOptionValue("Operation",1)
-  elseif op=="MAX" then
-    objects.maths:setOptionValue("Operation",2)
-  elseif op=="MEAN" then
-    objects.maths:setOptionValue("Operation",3)
-  elseif op=="DIV" then
-    objects.maths:setOptionValue("Operation",4)    
-  elseif op=="INV" then
-    objects.maths:setOptionValue("Operation",5)       
-  elseif op=="MOD" then
-    objects.maths:setOptionValue("Operation",6)    
-  elseif op=="TANH" then
-    objects.maths:setOptionValue("Operation",7)   
-  elseif op=="ATAN" then
-    objects.maths:setOptionValue("Operation",8)
-  elseif op=="INLV" then
-    objects.maths:setOptionValue("Operation",9)                 
-  end
+  if op=="AONLY" then
+    objects.bitwise:setOptionValue("Operation",1)
+  elseif op=="BONLY" then
+    objects.bitwise:setOptionValue("Operation",2)
+  elseif op=="AND" then
+    objects.bitwise:setOptionValue("Operation",3)
+  elseif op=="OR" then
+    objects.bitwise:setOptionValue("Operation",4)    
+  elseif op=="XOR" then
+    objects.bitwise:setOptionValue("Operation",5)       
+  elseif op=="NAND" then
+    objects.bitwise:setOptionValue("Operation",6)       
+  elseif op=="NOR" then
+    objects.bitwise:setOptionValue("Operation",7)       
+  elseif op=="XNOR" then
+    objects.bitwise:setOptionValue("Operation",8)       
+  end    
 end
 
-function Maths:onShowMenu(objects,branches)
+function Bitwise:onShowMenu(objects,branches)
   local controls = {}
 
   controls.setHeader = MenuHeader {
     description = string.format("Current op is: %s.", self.op)
   }
 
-  controls.max = Task {
-    description = "MAX",
+  controls.a = Task {
+    description = "AONLY",
     task = function()
-      self:setOp("MAX")
+      self:setOp("AONLY")
     end
   }
 
-  controls.min = Task {
-    description = "MIN",
+  controls.b = Task {
+    description = "BONLY",
     task = function()
-      self:setOp("MIN")
+      self:setOp("BONLY")
     end
   }
 
-  controls.mean = Task {
-    description = "MEAN",
+  controls.andop = Task {
+    description = "AND",
     task = function()
-      self:setOp("MEAN")
+      self:setOp("AND")
     end
   }
 
-  controls.div = Task {
-    description = "DIV",
+  controls.orop = Task {
+    description = "OR",
     task = function()
-      self:setOp("DIV")
+      self:setOp("OR")
     end
   }  
 
-  controls.inv = Task {
-    description = "INV",
+  controls.xorop = Task {
+    description = "XOR",
     task = function()
-      self:setOp("INV")
-    end
-  }    
-
-  controls.mod = Task {
-    description = "MOD",
-    task = function()
-      self:setOp("MOD")
-    end
-  }      
-
-  controls.tanh = Task {
-    description = "TANH",
-    task = function()
-      self:setOp("TANH")
-    end
-  }    
-  
-  controls.atan = Task {
-    description = "ATAN",
-    task = function()
-      self:setOp("ATAN")
-    end
-  }    
-  
-  controls.inlv = Task {
-    description = "INLV",
-    task = function()
-      self:setOp("INLV")
+      self:setOp("XOR")
     end
   }        
+
+  controls.nandop = Task {
+    description = "NAND",
+    task = function()
+      self:setOp("NAND")
+    end
+  }     
+  
+  controls.norop = Task {
+    description = "NOR",
+    task = function()
+      self:setOp("NOR")
+    end
+  }     
+  
+  controls.xnorop = Task {
+    description = "XNOR",
+    task = function()
+      self:setOp("XNOR")
+    end
+  }       
 
   return controls, menu
 end
 
-function Maths:onLoadFinished()
-  self:setOp("MIN")
+function Bitwise:onLoadFinished()
+  self:setOp("AONLY")
 end
 
-function Maths:serialize()
+function Bitwise:serialize()
   local t = Unit.serialize(self)
   t.mathOp = self.op
   return t
 end
 
-function Maths:deserialize(t)
+function Bitwise:deserialize(t)
   Unit.deserialize(self,t)
   if t.mathOp then
     self:setOp(t.mathOp)
   end
 end
-
-return Maths
+return Bitwise

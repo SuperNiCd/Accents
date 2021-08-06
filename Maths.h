@@ -13,6 +13,7 @@ Joe Filbrun
 #define MATHS_CHOICE_MOD 6
 #define MATHS_CHOICE_TANH 7
 #define MATHS_CHOICE_ATAN 8
+#define MATHS_CHOICE_INLV 9
 
 #pragma once
 
@@ -37,8 +38,7 @@ public:
     // float getVaults(int);
 
 protected:
-  // Protected declarations are also omitted from the swig wrapper.  
-//   float vault[128] = { };
+  bool interleave = true;
 
 
 };

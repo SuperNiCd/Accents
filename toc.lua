@@ -15,6 +15,9 @@ local units = {
    
     -- {category="Oscillators"},
     {title="Aliasing Pulse",moduleName="BespokeAliasingPulse",keywords="oscillator",category="Oscillators"},
+
+    -- {title="DXEG",moduleName="DXEG",keywords="envelope",category="Envelopes"},
+    {title="Points",moduleName="PointsEG",keywords="envelope",category="Envelopes"},
     
 
   --   {category="Mapping and Control"},
@@ -54,6 +57,7 @@ local units = {
     {title="Flanger",moduleName="Flanger",keywords="modulate, pitch",category = "Audio Effects"},
     {title="Ring Modulator",moduleName="Ringmod",keywords="pitch, modulate",category="Audio Effects"},
     {title="Scorpio Vocoder", moduleName="Scorpio", keywords="filter, modulate",category="Audio Effects"},
+    {title="Bitwise", moduleName="Bitwise", keywords="combine", category="Audio Effects"}
   -- }
 }
   return {

@@ -124,7 +124,22 @@ void Maths::process()
         {
             out[i] = atan(a[i]);
         }
-        break;                  
+        break;         
+
+    case MATHS_CHOICE_INLV:
+        for (int i = 0; i < FRAMELENGTH; i++)
+        {
+            if(interleave==true) 
+            {
+                out[i] = a[i];
+            }
+            else
+            {
+                out[i] = b[i];
+            }
+            interleave = !interleave;
+        }
+        break;                   
 
     default:
         for (int i = 0; i < FRAMELENGTH; i++)

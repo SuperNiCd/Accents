@@ -20,13 +20,16 @@ function VoltageVault:onLoadGraph(channelCount)
   local sh = self:addObject("sh", libAccents.VoltageVault())
   local trig = self:addObject("trig", app.Comparator())
   local bptrig = self:addObject("bptrig",app.Comparator())
+  local sumtrig = self:addObject("sumtrig",app.Comparator())
   local index = self:addObject("index",app.ParameterAdapter())
   local indexRange = self:addObject("indexRange",app.MinMax())
   trig:setTriggerMode()
   bptrig:setToggleMode()
+  sumtrig:setToggleMode()
 
   connect(trig, "Out", sh, "Track")
   connect(bptrig, "Out", sh, "Bypass")
+  connect(sumtrig, "Out", sh, "SumInput")
   connect(self, "In1", sh, "In")
   connect(index,"Out",indexRange,"In")
   tie(sh, "Index", index, "Out")
@@ -34,6 +37,7 @@ function VoltageVault:onLoadGraph(channelCount)
 
   self:addMonoBranch("trig", trig, "In", trig, "Out")
   self:addMonoBranch("bypass", bptrig, "In", bptrig, "Out")
+  self:addMonoBranch("sum", sumtrig, "In", sumtrig, "Out")
   self:addMonoBranch("index", index, "In", index, "Out")
 
   if channelCount == 2 then
@@ -42,7 +46,7 @@ function VoltageVault:onLoadGraph(channelCount)
 end
 
 local views = {
-  expanded = {"trig","index","bypass"},
+  expanded = {"trig","index","bypass","sum"},
   collapsed = {}
 }
 
@@ -84,6 +88,13 @@ function VoltageVault:onLoadViews(objects, branches)
     branch = branches.bypass,
     comparator = objects.bptrig,
   }
+
+  controls.sum = Gate {
+    button = "sum",
+    description = "Add Input to Vault Val",
+    branch = branches.sum,
+    comparator = objects.sumtrig,
+  }  
     return controls, views
 end
 

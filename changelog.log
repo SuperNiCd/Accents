@@ -1,3 +1,9 @@
+2021-03-27 Accents v0.6.03
+NEW: Points envelope generator unit
+ENHANCED: Voltage Vault, new sum control.  When engaged, unit output = unit input + stored value of currently selected index
+ENHANCED: Maths new ops: INLV(A,B) interleave
+
+
 2021-03-13 Accents v0.6.02
 FIXED: Fixed Xo, Xoxo, Xoxoxo, Phaser units which I broke in 0.6.01
 FIXED: Xfade crossfade parameter was a bit backward with 0 being full volume for b
