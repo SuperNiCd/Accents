@@ -1,6 +1,6 @@
-# Accents v0.6.02
+# Accents v0.6.14
 
-Minimum required firmware v0.6.03
+Minimum required firmware v0.6.14
 
 See changelog.log for detailed changes in each versoin.
 
@@ -36,6 +36,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Phaser
 * XFade
 * Amie (Amplitude modulation synth)
+* Bitwise
 
 For more details and discussion about these units, please visit:
 

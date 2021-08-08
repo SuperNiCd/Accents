@@ -22,11 +22,11 @@
 
 # Override these defaults on the commandline:
 PKGNAME ?= Accents
-PKGVERSION ?= 0.6.04
+PKGVERSION ?= 0.6.14
 LIBNAME ?= libAccents
 ARCH ?= linux
 PROFILE ?= testing
-SDKPATH ?= ../../er-301
+SDKPATH ?= ../er-301
 
 # Describe your files to this makefile:
 headers = VoltageVault.h Maths.h PointsEG.h Bitwise.h

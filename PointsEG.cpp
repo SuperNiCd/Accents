@@ -2,7 +2,7 @@
 // #define BUILDOPT_DEBUG_LEVEL 10
 
 #include <od/constants.h>
-#include </home/joe/Accents/Accents/PointsEG.h>
+#include </home/joe/Accents/PointsEG.h>
 #include <od/config.h>
 #include <hal/ops.h>
 #include <hal/log.h>
