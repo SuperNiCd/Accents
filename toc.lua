@@ -63,7 +63,7 @@ local units = {
   return {
     title = "Accents",
     name = "accents",
-    aliases = {"accents", "Accents"}
+    aliases = {"accents", "Accents"},
     keyword = "accents",
     author = "Joe",
     units = units

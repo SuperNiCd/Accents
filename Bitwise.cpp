@@ -91,7 +91,7 @@ void Bitwise::process()
         {
             aVal = a[i] * INT32_MAX;
             bVal = b[i] * INT32_MAX;
-            opVal = ~(aVal & bVal);
+            opVal = ~(aVal | bVal);
             outVal = (float) opVal / INT32_MAX;
             out[i] = outVal;
         }
@@ -102,7 +102,7 @@ void Bitwise::process()
         {
             aVal = a[i] * INT32_MAX;
             bVal = b[i] * INT32_MAX;
-            opVal = ~(aVal & bVal);
+            opVal = ~(aVal ^ bVal);
             outVal = (float) opVal / INT32_MAX;
             out[i] = outVal;
         }

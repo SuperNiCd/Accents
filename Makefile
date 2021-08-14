@@ -22,7 +22,7 @@
 
 # Override these defaults on the commandline:
 PKGNAME ?= Accents
-PKGVERSION ?= 0.6.14
+PKGVERSION ?= 0.6.15
 LIBNAME ?= libAccents
 ARCH ?= linux
 PROFILE ?= testing
