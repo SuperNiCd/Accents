@@ -3,6 +3,7 @@ local units = {
     -- {category="Essentials"},
     {title="Linear Sampling VCA", moduleName="LinearSamplingVCA",keywords="modulate, utility",category="Essentials"},
     {title="Xfade",moduleName="XFade",keywords="utility",category="Essentials"},
+    -- {title="Tuner", moduleName="Tuner", keywords="measurement", category="Essentials"},
 
     -- {category = "Delays and Reverb"},
 
@@ -34,6 +35,8 @@ local units = {
     {title="Voltage Bank 2",moduleName="VoltageBank2",keywords="mapping",category="Mapping and Control"},
     {title="Octave CV Shifter", moduleName="OctaveCVShifter",keywords="mapping",category="Mapping and Control"},
     {title="AB Switch", moduleName="ABSwitch",keywords="control",category="Mapping and Control"},
+    
+
 
     -- {category="Timing"},
     {title="Carousel Clock Divider",moduleName="CarouselClockDivider",keywords="timing",category="Timing"},

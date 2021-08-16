@@ -22,16 +22,17 @@
 
 # Override these defaults on the commandline:
 PKGNAME ?= Accents
-PKGVERSION ?= 0.6.15
+PKGVERSION ?= 0.6.16
 LIBNAME ?= libAccents
 ARCH ?= linux
 PROFILE ?= testing
 SDKPATH ?= ../er-301
 
+
 # Describe your files to this makefile:
-headers = VoltageVault.h Maths.h PointsEG.h Bitwise.h
-sources = VoltageVault.cpp Accents.cpp.swig Maths.cpp PointsEG.cpp Bitwise.cpp
-assets = toc.lua  Ringmod.lua ABSwitch.lua Amie.lua BespokeAliasingPulse.lua BespokeBPF.lua Bitwise.lua CarouselClockDivider.lua ClockedRandomGate.lua Compare.lua Flanger.lua LinearSamplingVCA.lua Logics.lua MathsUnit.lua MotionSensor.lua OctaveCVShifter.lua Phaser4.lua PingableScaledRandom.lua PointsEG.lua RotarySpeakerSim.lua Scorpio.lua StereoEnsemble.lua TimedGate.lua VoltageBank.lua VoltageBank4.lua VoltageBank2.lua VoltageVault.lua WeightedCoinToss.lua XFade.lua Xo.lua Xoxo.lua Xoxoxo.lua Xxxxxx.lua assets/*
+headers = VoltageVault.h Maths.h PointsEG.h Bitwise.h Tuner.h TunerGraphic.h TunerGraphicSub.h
+sources = VoltageVault.cpp Accents.cpp.swig Maths.cpp PointsEG.cpp Bitwise.cpp Tuner.cpp TunerGraphic.cpp TunerGraphicSub.cpp
+assets = toc.lua  Ringmod.lua ABSwitch.lua Amie.lua BespokeAliasingPulse.lua BespokeBPF.lua Bitwise.lua CarouselClockDivider.lua ClockedRandomGate.lua Compare.lua Flanger.lua LinearSamplingVCA.lua Logics.lua MathsUnit.lua MotionSensor.lua OctaveCVShifter.lua Phaser4.lua PingableScaledRandom.lua PointsEG.lua RotarySpeakerSim.lua Scorpio.lua StereoEnsemble.lua TimedGate.lua Tuner.lua TunerControl.lua VoltageBank.lua VoltageBank4.lua VoltageBank2.lua VoltageVault.lua WeightedCoinToss.lua XFade.lua Xo.lua Xoxo.lua Xoxoxo.lua Xxxxxx.lua assets/*
 
 includes = .
 
@@ -56,7 +57,7 @@ objects = $(addprefix $(out_dir)/,$(c_sources:%.c=%.o))
 objects += $(addprefix $(out_dir)/,$(cpp_sources:%.cpp=%.o))
 objects += $(swig_object)
 
-# includes += $(SDKPATH) $(SDKPATH)/arch/$(ARCH)
+includes += $(SDKPATH) $(SDKPATH)/arch/$(ARCH)
 includes += $(SDKPATH) $(SDKPATH)/arch/$(ARCH) $(SDKPATH)/emu
 
 ifeq ($(ARCH),am335x)

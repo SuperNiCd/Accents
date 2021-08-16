@@ -9,6 +9,9 @@
 #include <./Maths.h>
 #include <./PointsEG.h>
 #include <./Bitwise.h>
+#include <./Tuner.h>
+#include <./TunerGraphic.h>
+#include <./TunerGraphicSub.h>
 
 
 #define SWIGLUA
@@ -19,3 +22,6 @@
 %include <./Maths.h>
 %include <./PointsEG.h>
 %include <./Bitwise.h>
+%include <./Tuner.h>
+%include <./TunerGraphic.h>
+%include <./TunerGraphicSub.h>
