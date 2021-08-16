@@ -1,3 +1,7 @@
+2021-08-16 Accents v0.6.16
++ NEW: Bitwise Unit
++ NEW: Tuner Unit
+
 2021-03-27 Accents v0.6.03
 NEW: Points envelope generator unit
 ENHANCED: Voltage Vault, new sum control.  When engaged, unit output = unit input + stored value of currently selected index

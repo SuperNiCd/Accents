@@ -1,4 +1,4 @@
-# Accents v0.6.14
+# Accents v0.6.16
 
 Minimum required firmware v0.6.14
 
@@ -25,6 +25,7 @@ This repo contains units for the Orthogonal Devices ER-301 Sound Computer.  It c
 * Voltage Vault
 * Octave CV Shifter
 * Timed Gate
+* Tuner
 * Scorpio Vocoder
 * Linear Sampling VCA
 * AB Switch
