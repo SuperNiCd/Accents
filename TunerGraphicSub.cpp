@@ -25,7 +25,7 @@ void TunerGraphicSub::draw(od::FrameBuffer &fb)
         fb.text(WHITE, MARGIN, mHeight - 12, "Frequency (Hz)", 10);
         freq = mpTuner->frequency;
         char buffer[64];
-        int ret = snprintf(buffer, sizeof buffer, "%f", freq);
+        int ret = snprintf(buffer, sizeof buffer, "%.2f", freq);
         fb.text(WHITE, MARGIN, mHeight - 24, buffer, 14);
     }
 }

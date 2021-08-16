@@ -24,6 +24,8 @@ protected:
   friend class TunerGraphicSub;
   // float radiusIndex = 0.0;
   float frequency = 0.0f;
+  float previousFrequency = 0.0f;
+  float currentFrequency = 0.0f;
   int ticksSinceLastZeroCrossing = 1;
   float lastSampleValue = 0.0f;
 };

@@ -52,18 +52,6 @@ local indexMap = linMap(0, 1.0, 1, 0.1, 0.01, 0.001)
 function Tuner:onLoadViews(objects, branches)
     local controls = {}
 
-    -- controls.index = GainBias {
-    --     button = "index",
-    --     description = "test",
-    --     branch = branches.index,
-    --     gainbias = objects.index,
-    --     range = objects.indexRange,
-    --     biasMap = indexMap,
-    --     -- biasPrecision = 0,
-    --     -- gainMap = indexMap,
-    --     initialBias = 1.0,
-    --   }
-
       controls.circle = TunerControl {
         tuner = objects.tuner
       }

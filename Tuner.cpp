@@ -9,9 +9,7 @@
 // #include <vector>
 #include <hal/log.h>
 
-ConfigData globalConfig;
 
-// const std::vector<int> notes = { };
 Tuner::Tuner()
 {
     addInput(mInput);
@@ -34,8 +32,14 @@ void Tuner::process()
         out[i] = in[i];
         if (lastSampleValue < 0.0f && in[i] >= 0.0f)
         {
-
-            frequency = (frequency + (1 / (ticksSinceLastZeroCrossing * globalConfig.samplePeriod)))/2;
+            // Determine frequency, do some de-jittering
+            float value = (int)(1 / (ticksSinceLastZeroCrossing * globalConfig.samplePeriod) * 100 + .5);
+            currentFrequency = (float)value / 100;
+            if (currentFrequency == previousFrequency)
+            {
+                frequency = currentFrequency;
+            }
+            previousFrequency = currentFrequency;
             // logDebug(1, "ticksSinceLastZeroCrossing=%d, freq=%f", ticksSinceLastZeroCrossing, frequency);
             ticksSinceLastZeroCrossing = 0;
         }

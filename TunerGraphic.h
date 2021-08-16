@@ -20,4 +20,6 @@ private:
   float currentFreq = 0.0f;
   int topIndex = 1;
   int targetIndex = 1;
+  int noteIndex = 0;
+  float scale = 0;
 };

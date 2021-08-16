@@ -23,9 +23,8 @@ const float freqs[108] = {16.35, 17.32, 18.35, 19.45, 20.6, 21.83, 23.12, 24.5, 
 const char *notes[108] = {"C0", "C#0/Db0", "D0", "D#0/Eb0", "E0", "F0", "F#0/Gb0", "G0", "G#0/Ab0", "A0", "A#0/Bb0", "B0", "C1", "C#1/Db1", "D1", "D#1/Eb1", "E1", "F1", "F#1/Gb1", "G1", "G#1/Ab1", "A1", "A#1/Bb1", "B1", "C2", "C#2/Db2", "D2", "D#2/Eb2", "E2", "F2", "F#2/Gb2", "G2", "G#2/Ab2", "A2", "A#2/Bb2", "B2", "C3", "C#3/Db3", "D3", "D#3/Eb3", "E3", "F3", "F#3/Gb3", "G3", "G#3/Ab3", "A3", "A#3/Bb3", "B3", "C4", "C#4/Db4", "D4", "D#4/Eb4", "E4", "F4", "F#4/Gb4", "G4", "G#4/Ab4", "A4", "A#4/Bb4", "B4", "C5", "C#5/Db5", "D5", "D#5/Eb5", "E5", "F5", "F#5/Gb5", "G5", "G#5/Ab5", "A5", "A#5/Bb5", "B5", "C6", "C#6/Db6", "D6", "D#6/Eb6", "E6", "F6", "F#6/Gb6", "G6", "G#6/Ab6", "A6", "A#6/Bb6", "B6", "C7", "C#7/Db7", "D7", "D#7/Eb7", "E7", "F7", "F#7/Gb7", "G7", "G#7/Ab7", "A7", "A#7/Bb7", "B7", "C8", "C#8/Db8", "D8", "D#8/Eb8", "E8", "F8", "F#8/Gb8", "G8", "G#8/Ab8", "A8", "A#8/Bb8", "B8"};
 void TunerGraphic::draw(od::FrameBuffer &fb)
 {
-  const int CURSOR = 3;
-  const int MARGIN = 2;
-  // int radius = MIN(mWidth / 2, mHeight / 2) - MARGIN - CURSOR;
+
+
   if (mpTuner)
   {
     currentFreq = mpTuner->frequency;
@@ -33,72 +32,51 @@ void TunerGraphic::draw(od::FrameBuffer &fb)
     // determine the highest note stop
     for (int i = 0; i < 108; i++)
     {
-      if (currentFreq <= freqs[i])
+      if (freqs[i] >= currentFreq)
       {
-        topIndex = i;
+        // topIndex = i;
+        targetIndex = i - 1;
         break;
       }
     }
 
-    if (abs(freqs[topIndex] - currentFreq) <= abs(freqs[topIndex - 1] - currentFreq))
+    float halfwayFreq = (freqs[targetIndex + 1] - freqs[targetIndex]) / 2;
+    if (currentFreq <= freqs[targetIndex] + halfwayFreq)
     {
-      targetIndex = topIndex;
+      scale = (currentFreq - freqs[targetIndex]) / halfwayFreq;
+      noteIndex = targetIndex;
     }
     else
     {
-      targetIndex = topIndex - 1;
-    }
-
-    // Determine if sharp or flat
-    bool sharp = false;
-    if (currentFreq > freqs[targetIndex])
-    {
-      sharp = true;
-    }
-
-    // Get halfway frequency to next target
-    float halfwayFreq = 0.0f;
-    float percentToHalf = 0.0f;
-    if (sharp)
-    {
-      halfwayFreq = (freqs[targetIndex + 1] - freqs[targetIndex]) / 2;
-      percentToHalf = (currentFreq - freqs[targetIndex]) / (halfwayFreq);
-    }
-    else
-    { // target 440, next down = 415, freq = 430
-      halfwayFreq = (freqs[targetIndex] - freqs[targetIndex - 1] / 2); // 440 - 415 / 2 = 12.5  --- 415+ 12.5 = 427.5
-      percentToHalf = -(currentFreq - (freqs[targetIndex-1] + halfwayFreq)) / (freqs[targetIndex-1] + halfwayFreq); // 75 - 50 / 25
+      scale = (currentFreq - freqs[targetIndex + 1]) / halfwayFreq;
+      noteIndex = targetIndex + 1;
     }
 
     int centerX = mWorldLeft + mWidth / 2;
     int centerY = mWorldBottom + mHeight / 2;
-    // logDebug(1, "sharp: %d", sharp);
-    // fb.circle(GRAY5, centerX, centerY, radius);
+    // logDebug(1, "scale: %f", scale);
+
     if (targetIndex >= 0)
     {
-      int offset = floor(strlen(notes[targetIndex]) / 2 * 16);
-      fb.text(WHITE, centerX - offset + 2, centerY, notes[targetIndex], 16);
-      fb.line(WHITE, centerX, centerY - 10, centerX, centerY - 24);
-      if (sharp)
+      int offset = floor(strlen(notes[noteIndex]) / 2 * 16);
+      fb.text(WHITE, centerX - offset + 2, centerY, notes[noteIndex], 16);
+      fb.line(WHITE, centerX, centerY - 20, centerX, centerY - 13);
+      fb.box(WHITE, centerX - 80, centerY - 18, centerX + 80, centerY - 15);
+      fb.text(WHITE, mWorldLeft + 2, mWorldBottom + 2, "b", 10);
+      fb.text(WHITE, centerX + 74, mWorldBottom + 2, "#", 10);
+      if (scale >= 0)
       {
-        fb.line(WHITE, centerX, centerY - 16, centerX + floor(80 * percentToHalf), centerY - 16);
-        fb.line(WHITE, centerX, centerY - 17, centerX + floor(80 * percentToHalf), centerY - 17);
-        fb.line(WHITE, centerX, centerY - 18, centerX + floor(80 * percentToHalf), centerY - 18);
+        fb.fill(WHITE, centerX, centerY - 18, centerX + (80 * scale), centerY - 16);
       }
-      else 
+      else
       {
-        fb.line(WHITE, centerX, centerY - 16, centerX - floor(80 * percentToHalf), centerY - 16);
-        fb.line(WHITE, centerX, centerY - 17, centerX - floor(80 * percentToHalf), centerY - 17);
-        fb.line(WHITE, centerX, centerY - 18, centerX - floor(80 * percentToHalf), centerY - 18);
-        
+        fb.fill(WHITE, centerX + (80 * scale), centerY - 18, centerX, centerY - 16);
       }
     }
     else
     {
       fb.text(WHITE, mWorldLeft + 6, centerY, "No note data", 10);
     }
-
-    // fb.text(WHITE, centerX-10, mHeight-32, notes[targetIndex], 10);
   }
 }
 
